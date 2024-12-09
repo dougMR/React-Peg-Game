@@ -1,38 +1,107 @@
 .App {
-  text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #999;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
+.board {
+    --board-unit: 0.5vmin;
+    --slot-unit: calc(0.83 * var(--board-unit));
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+    position: relative;
+    text-align: center;
+    z-index: 10;
+    &::before {
+        content: "";
+        display: block;
+        position: absolute;
+        z-index: -1;
+        width: 0;
+        height: 0;
+        /* border-left: 155px solid transparent;
+        border-right: 155px solid transparent;
+        border-bottom: 270px solid tan; */
+        border-left: calc(60 * var(--board-unit)) solid transparent;
+        border-right: calc(60 * var(--board-unit)) solid transparent;
+        border-bottom: calc(100 * var(--board-unit)) solid tan;
+        bottom: calc(-0.5 * var(--board-unit));
+        left: calc(-7.5 * var(--board-unit)); /*-17px;*/
+    }
+    &::after {
+        content: "";
+        display: block;
+        position: absolute;
+        z-index: -10;
+        width: 0;
+        height: 0;
+        /* border-left: 170px solid transparent;
+        border-right: 170px solid transparent;
+        border-bottom: 300px solid #444;
+        bottom: -9px;
+        left: -32px; */
+        border-left: calc(64.5 * var(--board-unit)) solid transparent;
+        border-right: calc(64.5 * var(--board-unit)) solid transparent;
+        border-bottom: calc(108 * var(--board-unit)) solid #444;
+        bottom: calc(-3.3 * var(--board-unit));
+        left: calc(-12 * var(--board-unit));
+    }
 }
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.slot {
+    display: inline-block;
+    position: relative;
+    border-radius: 50%;
+    /* width: 45px;
+    height: 45px;
+    border: 15px solid grey;
+    box-shadow: inset -5px 5px 5px #222;
+    margin: 0 5px; */
+    width: calc(17 * var(--slot-unit));
+    height: calc(17 * var(--slot-unit));
+    border: calc(5 * var(--slot-unit)) solid grey;
+    box-shadow: inset calc(-2 * var(--slot-unit)) calc(2 * var(--slot-unit))
+        calc(2 * var(--slot-unit)) #222;
+    margin: 0 calc(2 * var(--slot-unit));
+    background-color: #555;
+    box-sizing: border-box;
+    &.target {
+        /* border: 5px solid red; */
+        /* border-color: #3b877f; */
+    }
+    &.peg::after {
+        content: "";
+        position: absolute;
+        border-width: 1px;
+        border-radius: 50%;
+        /* width: 30px;
+        height: 30px;
+        left: -8px;
+        top: -8px; */
+        width: calc(11 * var(--slot-unit));
+        height: calc(11 * var(--slot-unit));
+        left: calc(-2 * var(--slot-unit));
+        top: calc(-2 * var(--slot-unit));
+        background-color: #a5682a;
+        box-shadow: inset calc(2 * var(--slot-unit)) calc(-2 * var(--slot-unit))
+                calc(2 * var(--slot-unit)) #00000055,
+            inset calc(-2 * var(--slot-unit)) calc(2 * var(--slot-unit))
+                calc(2 * var(--slot-unit)) #ffffff88,
+            calc(-3 * var(--slot-unit)) calc(3 * var(--slot-unit))
+                calc(4.5 * var(--slot-unit)) black;
+    }
+    &.peg.selected::before {
+        content: "";
+        display: block;
+        /* box-shadow: 0 0 5px 10px black, 0 0 20px 16px yellow; */
+        /* box-shadow: 0 0 4px 8px black, 0 0 10px 10px #009688,
+            0 0 20px 16px yellow; */
+        box-shadow: 0 0 calc(1.4 * var(--slot-unit))
+                calc(2.8 * var(--slot-unit)) black,
+            0 0 calc(4 * var(--slot-unit)) calc(4 * var(--slot-unit)) #009688,
+            0 0 calc(7.4 * var(--slot-unit)) calc(5.5 * var(--slot-unit)) yellow;
+        border-radius: 50%;
+        width: 100%;
+        height: 100%;
+    }
 }
