@@ -1,18 +1,28 @@
+
+body {
+  background-color: #999;
+}
+
 .App {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: space-around;
     height: 100vh;
-    background-color: #999;
+    --board-unit: 0.65vmin;
+    --slot-unit: calc(0.83 * var(--board-unit));
+    padding-top: calc(18 * var(--board-unit));
+    padding-bottom: calc(6 * var(--board-unit));
+    box-sizing: border-box;
+    box-shadow: inset 0 0 calc(36 * var(--board-unit)) calc(6 * var(--board-unit)) black;
 }
 
 .board {
-    --board-unit: 0.5vmin;
-    --slot-unit: calc(0.83 * var(--board-unit));
 
     position: relative;
     text-align: center;
     z-index: 10;
+    filter: drop-shadow(0 3px calc(6 * var(--board-unit)) #000000dd);
     &::before {
         content: "";
         display: block;
@@ -20,14 +30,11 @@
         z-index: -1;
         width: 0;
         height: 0;
-        /* border-left: 155px solid transparent;
-        border-right: 155px solid transparent;
-        border-bottom: 270px solid tan; */
-        border-left: calc(60 * var(--board-unit)) solid transparent;
-        border-right: calc(60 * var(--board-unit)) solid transparent;
-        border-bottom: calc(100 * var(--board-unit)) solid tan;
-        bottom: calc(-0.5 * var(--board-unit));
-        left: calc(-7.5 * var(--board-unit)); /*-17px;*/
+        border-left: calc(64* var(--board-unit)) solid transparent;
+        border-right: calc(64* var(--board-unit)) solid transparent;
+        border-bottom: calc(104* var(--board-unit)) solid tan;
+        bottom: calc(-3* var(--board-unit));
+        left: calc(-11.5* var(--board-unit));
     }
     &::after {
         content: "";
@@ -36,16 +43,11 @@
         z-index: -10;
         width: 0;
         height: 0;
-        /* border-left: 170px solid transparent;
-        border-right: 170px solid transparent;
-        border-bottom: 300px solid #444;
-        bottom: -9px;
-        left: -32px; */
-        border-left: calc(64.5 * var(--board-unit)) solid transparent;
-        border-right: calc(64.5 * var(--board-unit)) solid transparent;
-        border-bottom: calc(108 * var(--board-unit)) solid #444;
-        bottom: calc(-3.3 * var(--board-unit));
-        left: calc(-12 * var(--board-unit));
+        border-left: calc(72* var(--board-unit)) solid transparent;
+        border-right: calc(72* var(--board-unit)) solid transparent;
+        border-bottom: calc(116* var(--board-unit)) solid #cba673;
+        bottom: calc(-7.2* var(--board-unit));
+        left: calc(-19.5* var(--board-unit));
     }
 }
 .slot {
@@ -66,8 +68,9 @@
     background-color: #555;
     box-sizing: border-box;
     &.target {
-        /* border: 5px solid red; */
-        /* border-color: #3b877f; */
+        /* border: 5px solid rgb(231, 75, 75); */
+        border: calc(5* var(--slot-unit)) solid rgb(203 112 85);
+        background-color: #2a77b9;
     }
     &.peg::after {
         content: "";
@@ -85,10 +88,11 @@
         background-color: #a5682a;
         box-shadow: inset calc(2 * var(--slot-unit)) calc(-2 * var(--slot-unit))
                 calc(2 * var(--slot-unit)) #00000055,
-            inset calc(-2 * var(--slot-unit)) calc(2 * var(--slot-unit))
-                calc(2 * var(--slot-unit)) #ffffff88,
+            inset calc(-1.5 * var(--slot-unit)) calc(1.5 * var(--slot-unit))
+                calc(2 * var(--slot-unit)) #ffffaa88,
             calc(-3 * var(--slot-unit)) calc(3 * var(--slot-unit))
-                calc(4.5 * var(--slot-unit)) black;
+                calc(4.5 * var(--slot-unit)) black,
+            0 0 calc(4 * var(--slot-unit)) calc(-1 * var(--slot-unit)) black;
     }
     &.peg.selected::before {
         content: "";
@@ -98,10 +102,82 @@
             0 0 20px 16px yellow; */
         box-shadow: 0 0 calc(1.4 * var(--slot-unit))
                 calc(2.8 * var(--slot-unit)) black,
-            0 0 calc(4 * var(--slot-unit)) calc(4 * var(--slot-unit)) #009688,
-            0 0 calc(7.4 * var(--slot-unit)) calc(5.5 * var(--slot-unit)) yellow;
+            /* 0 0 calc(4 * var(--slot-unit)) calc(4 * var(--slot-unit)) #009688, */
+                0 0 calc(7.4 * var(--slot-unit)) calc(5.5 * var(--slot-unit))
+                yellow;
         border-radius: 50%;
         width: 100%;
         height: 100%;
+        mix-blend-mode: overlay;
+    }
+}
+
+.controls {
+    text-align: center;
+    & .control {
+        display: inline-block;
+        margin: 1vmin;
+        font-size: 1.3rem;
+        font-weight: bold;
+    }
+    & button,
+    input {
+      min-height: 2rem;
+      min-width: 2rem;
+      border-radius: 0.5rem;
+      border: 2px solid #3f3f3f;
+      background-color: #676767;
+      text-align: center;
+      vertical-align: middle;
+      padding: 0.3rem 0.5rem;
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #ddd;
+      &:hover {
+        box-shadow: inset -0.2rem 0.2rem 0.2rem #ffffff88, inset 0.2rem -0.2rem 0.2rem #00000088,  -0.1rem 0.1rem 0.4rem #000000aa ;
+      }
+        &[type="range"] {
+            padding: 0;
+        }
+    }
+    /* custom slider from  https://www.w3schools.com/howto/howto_js_rangeslider.asp */
+    & .control.history {
+        & span {
+            display: block;
+        }
+        & .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 2rem;
+            background: #d3d3d3;
+            outline: none;
+            opacity: 0.7;
+            -webkit-transition: 0.2s;
+            transition: opacity 0.2s;
+            border: none;
+            border-radius: 0;
+            margin: 0;
+        }
+
+        & .slider:hover {
+            opacity: 1;
+        }
+
+        & .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 2rem;
+            height: 2rem;
+            background: #04aa6d;
+            cursor: pointer;
+            opacity: 0.5;
+        }
+
+        & .slider::-moz-range-thumb {
+            width: 2rem;
+            height: 2rem;
+            background: #04aa6d;
+            cursor: pointer;
+        }
     }
 }

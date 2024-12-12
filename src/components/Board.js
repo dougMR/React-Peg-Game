@@ -14,90 +14,134 @@ function addDown(n) {
 }
 
 const rows = [];
+let firstLoad = true;
 
-const Board = ({ numRows }) => {
-    // const generateSlot = () => {
-    //     return {
-    //         peg: true,
-    //         target: false,
-    //         active: false,
-    //     };
-    // };
+const Board = ({
+    numRows,
+    randomStartSlotChecked,
+    showTargetSlots,
+    historicTurn,
+    setNumTurns,
+}) => {
     const [slots, setSlots] = useState([]);
-    const [slotUnit,setSlotUnit] = useState(`calc(${5/numRows} * var(--board-unit))`)
+    const [slotsChanged, setSlotsChanged] = useState(false);
+    const [slotUnit, setSlotUnit] = useState(
+        `calc(${5 / numRows} * var(--board-unit))`
+    );
+    const [boardHistory, setBoardHistory] = useState([]);
     const buildRowsFlag = useRef(true);
+
+    // v Initialize board
     const buildSlots = () => {
-        // console.log('buildSlots()');
+        console.log("buildSlots()");
         const initSlots = [];
-        for (
-            let elementIndex = 0;
-            elementIndex < addDown(numRows);
-            elementIndex++
-        ) {
-            const peg = elementIndex !== 4; //Math.random() < 0.5;
+        const numSlots = addDown(numRows);
+        const emptyStartSlotIndex = randomStartSlotChecked
+            ? Math.floor(Math.random() * numSlots)
+            : 4;
+        for (let elementIndex = 0; elementIndex < numSlots; elementIndex++) {
+            const peg = elementIndex !== emptyStartSlotIndex;
             initSlots[elementIndex] = {
                 index: elementIndex,
                 peg,
-                selected: false, //peg && Math.random() < 0.5,
+                selected: false,
                 target: false,
             };
         }
+        console.log("initSlots.length:", initSlots.length);
         setSlots(initSlots);
+
+        if (firstLoad) {
+            firstLoad = false;
+            saveCurrentMove(initSlots);
+        }
+        setSlotsChanged(!slotsChanged);
     };
 
     const buildRows = () => {
         // rows is an array of arrays, each representing a row containing indices of slots in that row
         const slotsCopy = [...slots];
-        // console.log('slots:',slots);
         for (let r = 0; r < numRows; r++) {
             rows[r] = [];
             const rowLength = r + 1;
             const firstIndex = addDown(r);
-            // console.log("row", r, "first index: ", firstIndex);
             for (
                 let slotIndex = firstIndex;
                 slotIndex < firstIndex + rowLength;
                 slotIndex++
             ) {
-                // console.log('slotIndex',slotIndex);
+                // this is easier overall than the deleted getColum(slot) and getRow(slot) which
                 slotsCopy[slotIndex].myColumn = rows[r].length;
                 slotsCopy[slotIndex].myRow = r;
                 rows[r].push(slotIndex);
             }
-            // console.log('rows[',r,']',rows[r])
         }
         setSlots(slotsCopy);
     };
 
-    const setSlotCssUnits = (numRows) => {
-        const relativeUnit = 5/numRows;
-        setSlotUnit(`calc(${relativeUnit} * var(--board-unit))`)
-        // console.log(document.querySelector('.board'));
-        // document.querySelector(".board").style.setProperty("--slot-unit", `calc(${relativeUnit} * var(--board-unit))`);
-        // const boardEl = document.documentElement.querySelector(".board");//.style.setProperty("--slot-unit", `calc(${relativeUnit} * var(--board-unit))`);
-        // console.log('boardEl:',boardEl);
-    }
+    // ^ Initialize board
+
+    const setSlotCssUnits = () => {
+        // v This 'formula' is based on original css element sizes -> maybe 1 board-unit was 5 vmin?
+        // anyhow, this works now. v
+        const relativeUnit = 5 / numRows;
+        setSlotUnit(`calc(${relativeUnit} * var(--board-unit))`);
+    };
 
     useEffect(() => {
         console.log("useEffect buildSlots");
+        setSlotCssUnits();
         buildSlots();
-    }, []);
+    }, [numRows]);
+
     useEffect(() => {
-        if (buildRowsFlag.current === true && slots.length > 0) {
+        // Feels like a hacky way to make sure slots is already built, and set, before calling buildRows()
+        // And making sure buildRows() only happens once
+        if (buildRowsFlag.current && slots.length > 0) {
             console.log("useEffect buildRows");
-            console.log("slots:", slots);
             buildRows();
-            console.log("rows:", rows);
             buildRowsFlag.current = false;
         }
-    }, [slots]);
+    }, [slotsChanged]);
+
+    useEffect(() => {
+        console.log("useEffect showTurn()");
+        if (historicTurn >= 0) showTurn(historicTurn);
+    }, [historicTurn]);
+
+    useEffect(() => {
+        console.log("boardHistory:", boardHistory);
+    }, [boardHistory]);
+
+    // Move History ----------------------------
+    const saveCurrentMove = (slots) => {
+        console.log("saveCurrentMove()");
+        const currentMove = JSON.parse(JSON.stringify(slots));
+        setNumTurns(boardHistory.length);
+        setBoardHistory((prevHistory) => {
+            console.log("prevHistory:", prevHistory);
+            return [...prevHistory, currentMove];
+        });
+        console.log(
+            "saveCurrentMove(), boardHistory.length:",
+            boardHistory.length
+        );
+    };
+
+    const showTurn = (turnIndex) => {
+        // load board layout
+        console.log("showTurn(", turnIndex, ")");
+        setSlots(boardHistory[turnIndex]);
+    };
+
+    // ^ / Move History
 
     const selectSlot = (index) => {
-        // console.log('rows:',rows);
         const slotsCopy = [...slots];
         const slot = slotsCopy[index];
-        // Clear targets
+
         if (slot.peg) {
+            // Clear targets
             for (const slot of slotsCopy) {
                 slot.target = false;
             }
@@ -106,7 +150,7 @@ const Board = ({ numRows }) => {
                 // toggle selected for clicked slot
                 s.selected = s === slot ? !slot.selected : false;
             }
-            if(slot.selected)hilightPegTargetSlots(slot);
+            if (slot.selected) hilightPegTargetSlots(slot);
             setSlots(slotsCopy);
         } else if (slot.target) {
             // move peg from selected slot to here
@@ -116,51 +160,39 @@ const Board = ({ numRows }) => {
                 slot.peg = true;
                 getSlotBetween(selectedSlot, slot).peg = false;
             }
+            // Clear targets
             for (const slot of slotsCopy) {
                 slot.target = false;
             }
             setSlots(slotsCopy);
+            saveCurrentMove(slotsCopy);
         }
     };
 
-    // const getSlotRow = (slotIndex) => {
-    //     return rows.find((r) => r.some((slot) => slot.index === slotIndex));
-    // };
-    // const getSlotColumn = (slotIndex) => {
-    //     return getSlotRow(slotIndex).indexOf(slotIndex);
-    // };
-
+    // v Utility stuff v
     const getSlotByRowColumn = (r, c) => {
-        // console.log('getSlotByRowColumn(',r,c,')')
-        // const row = rows[r];
-        // console.log('rows[',r,']:',row);
-        // if (!rows[r]) return null;
         const slot = slots.find(
             (slot) => slot.myColumn === c && slot.myRow === r
         );
-        // console.log('slotIndex:',slotIndex);
         return slot;
     };
+
     const getSlotBetween = (slotA, slotB) => {
-        console.log("getSlotBetween()");
-        console.log(slotB);
         const c = (slotA.myColumn + slotB.myColumn) / 2;
         const r = (slotA.myRow + slotB.myRow) / 2;
         const slotBetween = getSlotByRowColumn(r, c);
         return slotBetween;
     };
+
     const getPegTargetSlots = (slot) => {
         // find slots 2 spaces away from slot in all directions
-        // console.log('getPegTargetSlots(',slot,')')
         const targetSlots = [];
         if (slot.peg) {
             const sr = slot.myRow,
                 sc = slot.myColumn;
             for (let r = sr - 2; r < sr + 3; r += 2) {
-                // console.log('r:',r);
                 for (let c = sc - 2; c < sc + 3; c += 2) {
                     // Rule out above to right, self and below to left
-                    // console.log('c:',c);
                     if (
                         (r < sr && c > sc) ||
                         (r === sr && c === sc) ||
@@ -168,9 +200,7 @@ const Board = ({ numRows }) => {
                     ) {
                         continue;
                     }
-                    // console.log('not ruled out')
                     const potentialTarget = getSlotByRowColumn(r, c);
-                    // console.log('potentialTarget:',potentialTarget)
 
                     if (potentialTarget) {
                         // is there a peg between target and moving peg?
@@ -189,7 +219,6 @@ const Board = ({ numRows }) => {
 
     const hilightPegTargetSlots = (fromSlot) => {
         const fairTargets = getPegTargetSlots(fromSlot);
-        console.log("targetSlots: ", fairTargets);
         for (const slot of slots) {
             slot.target =
                 fairTargets.find((target) => target === slot) !== undefined;
@@ -197,19 +226,27 @@ const Board = ({ numRows }) => {
     };
 
     return (
-        <div className="board" style={{"--slot-unit":slotUnit}}>
+        <div className="board" style={{ "--slot-unit": slotUnit }}>
             {slots.map((slot, index) => {
                 return (
                     <React.Fragment key={index}>
                         <div
                             className={`slot${slot.peg ? " peg" : ""}${
                                 slot.selected ? " selected" : ""
-                            }${slot.target ? " target" : ""}`}
+                            }${
+                                slot.target && showTargetSlots ? " target" : ""
+                            }`}
                             onPointerDown={() => {
                                 selectSlot(index);
                             }}
                         ></div>
-                        {[0, 2, 5, 9,14,20,27].includes(index) ? <br /> : ""}
+                        {[0, 2, 5, 9, 14, 20, 27, 35, 44, 54].includes(
+                            index
+                        ) ? (
+                            <br />
+                        ) : (
+                            ""
+                        )}
                     </React.Fragment>
                 );
             })}
