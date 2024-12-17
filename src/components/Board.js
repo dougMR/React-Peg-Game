@@ -13,8 +13,8 @@ function addDown(n) {
     }
 }
 const copyObj = (obj) => {
-    return JSON.parse(JSON.stringify(obj))
-}
+    return JSON.parse(JSON.stringify(obj));
+};
 
 let firstLoad = true;
 
@@ -28,15 +28,13 @@ const Board = ({
 }) => {
     // slots[] is the current board
     const [slots, setSlots] = useState([]);
-    // slotsChanged is set by buildSlots() to trigger buildRows()  HACKY?
-    // const [slotsChanged, setSlotsChanged] = useState(false);
     // slotUnit is sizing for css
     const [slotUnit, setSlotUnit] = useState(
         `calc(${5 / numRows} * var(--board-unit))`
     );
     // boardHistory is a record of slots from each turn
     const [boardHistory, setBoardHistory] = useState([]);
-    // 
+    //
     const buildRowsFlag = useRef(true);
 
     // v Initialize board
@@ -64,13 +62,12 @@ const Board = ({
             firstLoad = false;
             saveCurrentMove(initSlots);
         }
-        // setSlotsChanged(!slotsChanged);
     };
 
     const addColumnsAndRowsToSlots = (slots) => {
-        console.log("buildRows()");
+        console.log("addColumnsAndRowsToSlots()");
         // This makes changes directly to the slots provided in the argument
-        
+
         // DMR 12/17/24 - ^ There were too many hoops previously.  This is more direct, and synchronous, fewer pitfalls.  In fact, this whole function could be folded into the buildSlots() function.
 
         // rows is an array of arrays, each representing a row containing indices of slots in that row
@@ -90,8 +87,6 @@ const Board = ({
                 rows[r].push(slotIndex);
             }
         }
-        // console.log('slotsCopy:',slotsCopy)
-        // setSlots(slotsCopy);
     };
 
     // ^ Initialize board
@@ -109,19 +104,12 @@ const Board = ({
         buildSlots();
     }, [numRows]);
 
-    // useEffect(() => {
-    //     // Feels like a hacky way to make sure slots is already built, and set, before calling buildRows()
-    //     // And making sure buildRows() only happens once
-    //     console.log('slots changed.')
-    //     if (buildRowsFlag.current && slots.length > 0) {
-    //         console.log("useEffect buildRows");
-    //         buildRows();
-    //         buildRowsFlag.current = false;
-    //     }
-    // }, [slotsChanged]);
-
     useEffect(() => {
-        console.log("useEffect historicTurnIndex changed to",historicTurnIndex,".");
+        console.log(
+            "useEffect historicTurnIndex changed to",
+            historicTurnIndex,
+            "."
+        );
         // console.log('historicTurnIndex:',historicTurnIndex);
         // console.log('boardHistory:',boardHistory.length)
         // console.log('numTurns:',numTurns);
@@ -130,9 +118,9 @@ const Board = ({
         }
     }, [historicTurnIndex]);
 
-    useEffect(() => {
-        console.log("boardHistory:", boardHistory);
-    }, [boardHistory]);
+    // useEffect(() => {
+    //     console.log("boardHistory:", boardHistory);
+    // }, [boardHistory]);
 
     // Move History ----------------------------
     const saveCurrentMove = (currentSlots) => {
@@ -144,18 +132,24 @@ const Board = ({
             newBoardHistory.length = historicTurnIndex + 1;
         console.log("historicTurnIndex:", historicTurnIndex);
         console.log("newBoardHistory.length:", newBoardHistory.length);
-        console.log("currentMove === newBoardHistory[newBoardHistory.length-1]:",currentMove === newBoardHistory[newBoardHistory.length-1]);
-        console.log("currentMove === currentSlots:",currentMove === currentSlots)
+        console.log(
+            "currentMove === newBoardHistory[newBoardHistory.length-1]:",
+            currentMove === newBoardHistory[newBoardHistory.length - 1]
+        );
+        console.log(
+            "currentMove === currentSlots:",
+            currentMove === currentSlots
+        );
         setNumTurns(newBoardHistory.length + 1);
         setBoardHistory([...newBoardHistory, currentMove]);
-        // setHistoricTurnIndex(newBoardHistory.length);
+        setHistoricTurnIndex(newBoardHistory.length);
     };
 
     const showTurn = (turnIndex) => {
         // const turnIndex = turnNum - 1;
         // load board layout
         console.log("showTurn(", turnIndex, ")");
-        console.log('boardHistory.length:',boardHistory.length);
+        console.log("boardHistory.length:", boardHistory.length);
         // console.log('this turn: ',boardHistory[turnIndex])
         setSlots(copyObj(boardHistory[turnIndex]));
     };
@@ -164,10 +158,10 @@ const Board = ({
 
     // v Select a Slot
     const selectSlot = (index) => {
-        console.log('  -- selectSlot(',index,')');
+        console.log("  -- selectSlot(", index, ")");
         const slotsCopy = [...slots]; //copyObj(slots);
         const slot = slotsCopy[index];
-        console.log('slot:',slot);
+        // console.log("slot:", slot);
         if (slot.peg) {
             // Clear targets
             for (const slot of slotsCopy) {
@@ -178,12 +172,20 @@ const Board = ({
                 // toggle selected for clicked slot
                 s.selected = s === slot ? !slot.selected : false;
             }
-            if (slot.selected) hilightPegTargetSlots(slot);
+            if (slot.selected) {
+                const fairTargets = getPegTargetSlots(slot);
+                for (const s of slotsCopy) {
+                    // hilight target slots
+                    s.target =
+                        fairTargets.find((target) => target === s) !==
+                        undefined;
+                }
+            }
             setSlots(slotsCopy);
         } else if (slot.target) {
             // move peg from selected slot to here
             const selectedSlot = slotsCopy.find((s) => s.selected);
-            console.log('selectedSlot:',selectedSlot.index);
+            console.log("selectedSlot:", selectedSlot.index);
             if (selectedSlot) {
                 selectedSlot.peg = false;
                 slot.peg = true;
@@ -221,49 +223,59 @@ const Board = ({
 
     const getPegTargetSlots = (slot) => {
         // find slots 2 spaces away from slot in all directions
-        console.log('getPegTargetSlots()');
-        console.log('from slot:',slot);
+        // console.log("getPegTargetSlots()");
+        // console.log("from slot:", slot);
         const targetSlots = [];
         if (slot.peg) {
             const sr = slot.myRow,
                 sc = slot.myColumn;
-                console.log("sc,sr:",sc,sr);
+            // console.log("sc,sr:",sc,sr);
             for (let r = sr - 2; r < sr + 3; r += 2) {
                 for (let c = sc - 2; c < sc + 3; c += 2) {
                     // Rule out above to right, self and below to left
-                    console.log("c,r:",c,r);
+                    // console.log("c,r:",c,r);
                     if (
                         (r < sr && c > sc) ||
                         (r === sr && c === sc) ||
                         (r > sr && c < sc)
                     ) {
+                        // console.log("no.")
                         continue;
                     }
                     const potentialTarget = getSlotByRowColumn(r, c);
                     if (potentialTarget) {
                         // is there a peg between target and moving peg?
+
                         if (
                             !potentialTarget.peg &&
                             getSlotBetween(slot, potentialTarget).peg
                         ) {
+                            // console.log("target:",potentialTarget);
                             targetSlots.push(potentialTarget);
                         }
+                        //  else {
+                        //     console.log("no.")
+                        // }
                     }
+                    //  else {
+                    //     console.log("no.")
+                    // }
                 }
             }
         }
+        // console.log('targetSlots:',targetSlots);
         return targetSlots;
     };
 
-    const hilightPegTargetSlots = (fromSlot) => {
-        const fairTargets = getPegTargetSlots(fromSlot);
-        console.log('hilightPegTargetSlots()');
-        console.log('fairTargets:',fairTargets.map(t=>t.index));
-        for (const slot of slots) {
-            slot.target =
-                fairTargets.find((target) => target === slot) !== undefined;
-        }
-    };
+    // const getFairTargetSlots = (fromSlot) => {
+    //     const fairTargets = getPegTargetSlots(fromSlot);
+    //     for (const slot of slots) {
+    //         // hilight target slots
+    //         slot.target =
+    //             fairTargets.find((target) => target === slot) !== undefined;
+    //     }
+    //     return fairTargets;
+    // };
 
     return (
         <div className="board" style={{ "--slot-unit": slotUnit }}>

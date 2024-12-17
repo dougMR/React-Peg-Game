@@ -19,15 +19,17 @@ function App() {
     const [historicTurnIndex, setHistoricTurnIndex] = useState(-1);
     const [numTurns, setNumTurns] = useState(0);
 
+    const [refreshKey, setRefreshKey] = useState(0);
+
     const refreshBoardKey = () => {
         setRefreshKey((prevKey) => prevKey + 1);
     };
 
     const forceUpdate = () => {
+        setHistoricTurnIndex(-1);
+        setNumTurns(1);
         refreshBoardKey();
     };
-
-    const [refreshKey, setRefreshKey] = useState(0);
 
     // useEffect(() => {
     //     console.log("numTurns:", numTurns);
