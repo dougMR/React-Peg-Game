@@ -12,23 +12,31 @@ function addDown(n) {
         return n + addDown(n - 1);
     }
 }
+const copyObj = (obj) => {
+    return JSON.parse(JSON.stringify(obj))
+}
 
-const rows = [];
 let firstLoad = true;
 
 const Board = ({
     numRows,
     randomStartSlotChecked,
     showTargetSlots,
-    historicTurn,
+    historicTurnIndex,
+    setHistoricTurnIndex,
     setNumTurns,
 }) => {
+    // slots[] is the current board
     const [slots, setSlots] = useState([]);
-    const [slotsChanged, setSlotsChanged] = useState(false);
+    // slotsChanged is set by buildSlots() to trigger buildRows()  HACKY?
+    // const [slotsChanged, setSlotsChanged] = useState(false);
+    // slotUnit is sizing for css
     const [slotUnit, setSlotUnit] = useState(
         `calc(${5 / numRows} * var(--board-unit))`
     );
+    // boardHistory is a record of slots from each turn
     const [boardHistory, setBoardHistory] = useState([]);
+    // 
     const buildRowsFlag = useRef(true);
 
     // v Initialize board
@@ -49,18 +57,24 @@ const Board = ({
             };
         }
         console.log("initSlots.length:", initSlots.length);
+        addColumnsAndRowsToSlots(initSlots);
         setSlots(initSlots);
 
         if (firstLoad) {
             firstLoad = false;
             saveCurrentMove(initSlots);
         }
-        setSlotsChanged(!slotsChanged);
+        // setSlotsChanged(!slotsChanged);
     };
 
-    const buildRows = () => {
+    const addColumnsAndRowsToSlots = (slots) => {
+        console.log("buildRows()");
+        // This makes changes directly to the slots provided in the argument
+        
+        // DMR 12/17/24 - ^ There were too many hoops previously.  This is more direct, and synchronous, fewer pitfalls.  In fact, this whole function could be folded into the buildSlots() function.
+
         // rows is an array of arrays, each representing a row containing indices of slots in that row
-        const slotsCopy = [...slots];
+        const rows = [];
         for (let r = 0; r < numRows; r++) {
             rows[r] = [];
             const rowLength = r + 1;
@@ -70,13 +84,14 @@ const Board = ({
                 slotIndex < firstIndex + rowLength;
                 slotIndex++
             ) {
-                // this is easier overall than the deleted getColum(slot) and getRow(slot) which
-                slotsCopy[slotIndex].myColumn = rows[r].length;
-                slotsCopy[slotIndex].myRow = r;
+                // this is easier overall than the deleted getColum(slot) and getRow(slot).  Better to just add column / row to each slot when board is first created
+                slots[slotIndex].myColumn = rows[r].length;
+                slots[slotIndex].myRow = r;
                 rows[r].push(slotIndex);
             }
         }
-        setSlots(slotsCopy);
+        // console.log('slotsCopy:',slotsCopy)
+        // setSlots(slotsCopy);
     };
 
     // ^ Initialize board
@@ -94,52 +109,65 @@ const Board = ({
         buildSlots();
     }, [numRows]);
 
-    useEffect(() => {
-        // Feels like a hacky way to make sure slots is already built, and set, before calling buildRows()
-        // And making sure buildRows() only happens once
-        if (buildRowsFlag.current && slots.length > 0) {
-            console.log("useEffect buildRows");
-            buildRows();
-            buildRowsFlag.current = false;
-        }
-    }, [slotsChanged]);
+    // useEffect(() => {
+    //     // Feels like a hacky way to make sure slots is already built, and set, before calling buildRows()
+    //     // And making sure buildRows() only happens once
+    //     console.log('slots changed.')
+    //     if (buildRowsFlag.current && slots.length > 0) {
+    //         console.log("useEffect buildRows");
+    //         buildRows();
+    //         buildRowsFlag.current = false;
+    //     }
+    // }, [slotsChanged]);
 
     useEffect(() => {
-        console.log("useEffect showTurn()");
-        if (historicTurn >= 0) showTurn(historicTurn);
-    }, [historicTurn]);
+        console.log("useEffect historicTurnIndex changed to",historicTurnIndex,".");
+        // console.log('historicTurnIndex:',historicTurnIndex);
+        // console.log('boardHistory:',boardHistory.length)
+        // console.log('numTurns:',numTurns);
+        if (historicTurnIndex >= 0) {
+            showTurn(historicTurnIndex);
+        }
+    }, [historicTurnIndex]);
 
     useEffect(() => {
         console.log("boardHistory:", boardHistory);
     }, [boardHistory]);
 
     // Move History ----------------------------
-    const saveCurrentMove = (slots) => {
-        console.log("saveCurrentMove()");
-        const currentMove = JSON.parse(JSON.stringify(slots));
-        setNumTurns(boardHistory.length);
-        setBoardHistory((prevHistory) => {
-            console.log("prevHistory:", prevHistory);
-            return [...prevHistory, currentMove];
-        });
-        console.log(
-            "saveCurrentMove(), boardHistory.length:",
-            boardHistory.length
-        );
+    const saveCurrentMove = (currentSlots) => {
+        console.log("  -- saveCurrentMove()");
+        const currentMove = copyObj(currentSlots);
+        const newBoardHistory = copyObj(boardHistory); //[...boardHistory];
+        // trim boardHistory if historicTurnIndex is less than latest turn
+        if (historicTurnIndex > 0)
+            newBoardHistory.length = historicTurnIndex + 1;
+        console.log("historicTurnIndex:", historicTurnIndex);
+        console.log("newBoardHistory.length:", newBoardHistory.length);
+        console.log("currentMove === newBoardHistory[newBoardHistory.length-1]:",currentMove === newBoardHistory[newBoardHistory.length-1]);
+        console.log("currentMove === currentSlots:",currentMove === currentSlots)
+        setNumTurns(newBoardHistory.length + 1);
+        setBoardHistory([...newBoardHistory, currentMove]);
+        // setHistoricTurnIndex(newBoardHistory.length);
     };
 
     const showTurn = (turnIndex) => {
+        // const turnIndex = turnNum - 1;
         // load board layout
         console.log("showTurn(", turnIndex, ")");
-        setSlots(boardHistory[turnIndex]);
+        console.log('boardHistory.length:',boardHistory.length);
+        // console.log('this turn: ',boardHistory[turnIndex])
+        setSlots(copyObj(boardHistory[turnIndex]));
     };
 
     // ^ / Move History
 
+    // v Select a Slot
     const selectSlot = (index) => {
-        const slotsCopy = [...slots];
+        console.log('  -- selectSlot(',index,')');
+        const slotsCopy = [...slots]; //copyObj(slots);
         const slot = slotsCopy[index];
-
+        console.log('slot:',slot);
         if (slot.peg) {
             // Clear targets
             for (const slot of slotsCopy) {
@@ -154,7 +182,8 @@ const Board = ({
             setSlots(slotsCopy);
         } else if (slot.target) {
             // move peg from selected slot to here
-            const selectedSlot = slots.find((s) => s.selected);
+            const selectedSlot = slotsCopy.find((s) => s.selected);
+            console.log('selectedSlot:',selectedSlot.index);
             if (selectedSlot) {
                 selectedSlot.peg = false;
                 slot.peg = true;
@@ -164,10 +193,11 @@ const Board = ({
             for (const slot of slotsCopy) {
                 slot.target = false;
             }
-            setSlots(slotsCopy);
             saveCurrentMove(slotsCopy);
+            setSlots(slotsCopy);
         }
     };
+    // ^ / Select a Slot
 
     // v Utility stuff v
     const getSlotByRowColumn = (r, c) => {
@@ -178,21 +208,30 @@ const Board = ({
     };
 
     const getSlotBetween = (slotA, slotB) => {
+        // console.log('getSlotBetween()');
+        // console.log('slotA:',slotA);
+        // console.log('slotB:',slotB);
         const c = (slotA.myColumn + slotB.myColumn) / 2;
         const r = (slotA.myRow + slotB.myRow) / 2;
+        // console.log('c,r:',c,r);
         const slotBetween = getSlotByRowColumn(r, c);
+        // console.log('slotBetween:',slotBetween);
         return slotBetween;
     };
 
     const getPegTargetSlots = (slot) => {
         // find slots 2 spaces away from slot in all directions
+        console.log('getPegTargetSlots()');
+        console.log('from slot:',slot);
         const targetSlots = [];
         if (slot.peg) {
             const sr = slot.myRow,
                 sc = slot.myColumn;
+                console.log("sc,sr:",sc,sr);
             for (let r = sr - 2; r < sr + 3; r += 2) {
                 for (let c = sc - 2; c < sc + 3; c += 2) {
                     // Rule out above to right, self and below to left
+                    console.log("c,r:",c,r);
                     if (
                         (r < sr && c > sc) ||
                         (r === sr && c === sc) ||
@@ -201,7 +240,6 @@ const Board = ({
                         continue;
                     }
                     const potentialTarget = getSlotByRowColumn(r, c);
-
                     if (potentialTarget) {
                         // is there a peg between target and moving peg?
                         if (
@@ -219,6 +257,8 @@ const Board = ({
 
     const hilightPegTargetSlots = (fromSlot) => {
         const fairTargets = getPegTargetSlots(fromSlot);
+        console.log('hilightPegTargetSlots()');
+        console.log('fairTargets:',fairTargets.map(t=>t.index));
         for (const slot of slots) {
             slot.target =
                 fairTargets.find((target) => target === slot) !== undefined;

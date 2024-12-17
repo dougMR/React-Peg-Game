@@ -16,13 +16,8 @@ function App() {
     const [numRows, setNumRows] = useState(5);
     const [randomStartSlotChecked, setRandomStartSlotChecked] = useState(false);
     const [showTargetSlots, setShowTargetSlots] = useState(false);
-    const [historicTurn, setHistoricTurn] = useState(-1);
+    const [historicTurnIndex, setHistoricTurnIndex] = useState(-1);
     const [numTurns, setNumTurns] = useState(0);
-    // const [, forceUpdate] = useReducer(x => {
-    //   console.log("forceUpdate()")
-    //   return x + 1
-    // }, 0);
-    // const forceUpdate = useForceUpdate();
 
     const refreshBoardKey = () => {
         setRefreshKey((prevKey) => prevKey + 1);
@@ -34,18 +29,20 @@ function App() {
 
     const [refreshKey, setRefreshKey] = useState(0);
 
-    useEffect(() => {
-        console.log("numTurns:", numTurns);
-    }, [numTurns]);
+    // useEffect(() => {
+    //     console.log("numTurns:", numTurns);
+    // }, [numTurns]);
 
     return (
         <div className="App">
             <Board
                 numRows={numRows}
+                // ?? DMR 12/16/24 - Why does updating the key reset the board to start state?
                 key={refreshKey}
                 randomStartSlotChecked={randomStartSlotChecked}
                 showTargetSlots={showTargetSlots}
-                historicTurn={historicTurn}
+                historicTurnIndex={historicTurnIndex}
+                setHistoricTurnIndex={setHistoricTurnIndex}
                 setNumTurns={setNumTurns}
             />
             <Controls
@@ -55,8 +52,8 @@ function App() {
                 setRandomStartSlotChecked={setRandomStartSlotChecked}
                 setShowTargetSlots={setShowTargetSlots}
                 numTurns={numTurns}
-                setHistoricTurn={setHistoricTurn}
-                historicTurn={historicTurn}
+                setHistoricTurnIndex={setHistoricTurnIndex}
+                historicTurnIndex={historicTurnIndex}
             />
         </div>
     );

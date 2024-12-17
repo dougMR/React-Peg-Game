@@ -4,8 +4,8 @@ const Controls = ({
     forceUpdate,
     setRandomStartSlotChecked,
     setShowTargetSlots,
-    setHistoricTurn,
-    historicTurn,
+    setHistoricTurnIndex,
+    historicTurnIndex,
     numTurns,
 }) => {
     const rowsInputListener = (event) => {
@@ -32,7 +32,7 @@ const Controls = ({
 
     return (
         <div className="controls">
-            <h3>{numTurns}</h3>
+            <h3>numTurns:{numTurns} <br /> historicTurnIndex:{historicTurnIndex}</h3>
             {/* <button onPointerDown={randomizeEmpty}>RANDOMIZE EMPTY</button> */}
             <div className="control">
                 <label htmlFor="rows-input">
@@ -79,15 +79,15 @@ const Controls = ({
             </div>
 
             <div className="control history">
-                <span>{historicTurn > -1 ? historicTurn : numTurns}</span>
+                <span>{historicTurnIndex > -1 ? historicTurnIndex : numTurns - 1}</span>
                 <input
                 className="slider"
                     type="range"
                     min="0"
-                    max={numTurns}
-                    value={historicTurn > -1 ? historicTurn : numTurns}
+                    max={numTurns-1}
+                    value={historicTurnIndex > -1 ? historicTurnIndex : numTurns-1}
                     // id="moves-slider"
-                    onChange={(event) => setHistoricTurn(event.target.value)}
+                    onChange={(event) => setHistoricTurnIndex(Number(event.target.value))}
                     // list="markers"
                 />
                 {/* <datalist id="markers">{getMarkerDatalistOptions()}</datalist> */}

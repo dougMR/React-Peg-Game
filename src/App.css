@@ -15,6 +15,7 @@ body {
     padding-bottom: calc(6 * var(--board-unit));
     box-sizing: border-box;
     box-shadow: inset 0 0 calc(36 * var(--board-unit)) calc(6 * var(--board-unit)) black;
+    gap: 2rem;
 }
 
 .board {
