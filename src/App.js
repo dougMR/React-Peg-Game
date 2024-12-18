@@ -46,7 +46,7 @@ function App() {
                 historicTurnIndex={historicTurnIndex}
                 setHistoricTurnIndex={setHistoricTurnIndex}
                 setNumTurns={setNumTurns}
-            />
+            ></Board>
             <Controls
                 numRows={numRows}
                 setNumRows={setNumRows}

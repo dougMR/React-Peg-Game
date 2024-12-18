@@ -9,7 +9,9 @@ const Controls = ({
     numTurns,
 }) => {
     const rowsInputListener = (event) => {
-        setNumRows(Number(event.target.value));
+        const inputNum = Number(event.target.value);
+        const clampedNum = Math.min(10, Math.max(4, inputNum));
+        setNumRows(clampedNum);
     };
     const toggleRandomStartSlot = (event) => {
         // console.log(event.target.checked)
@@ -23,23 +25,40 @@ const Controls = ({
     };
 
     const getMarkerDatalistOptions = () => {
-        let optionsList = "";
-        for (let markerNum = 0; markerNum < numTurns - 1; markerNum++) {
-            optionsList += `<option value="${markerNum}">${markerNum}</option>`;
-        }
-        return optionsList;
+        // let optionsList = ``;
+        // for (let markerNum = 0; markerNum < numTurns - 1; markerNum++) {
+        //     console.log("optionsList:",optionsList);
+        //     optionsList += `<option value="${markerNum}">${markerNum}</option>`;
+        // }
+        // return optionsList;
+        console.log("numTurns:", numTurns);
+        if (numTurns <= 0) return null;
+        const options = new Array(numTurns - 1).fill(null);
+        console.log("options_ar:", options);
+        return options.map((item, index) => {
+            console.log("option #", index);
+            return (
+                <option key={index} value={index}>
+                    {index}
+                </option>
+            );
+        });
     };
 
     return (
         <div className="controls">
-            <h3>numTurns:{numTurns} <br /> historicTurnIndex:{historicTurnIndex}</h3>
+            <h3>
+                numTurns:{numTurns} <br /> historicTurnIndex:{historicTurnIndex}
+            </h3>
             {/* <button onPointerDown={randomizeEmpty}>RANDOMIZE EMPTY</button> */}
             <div className="control">
                 <label htmlFor="rows-input">
                     {" "}
                     NUM ROWS:
                     <input
+                    style={{fieldSizing:"content"}}
                         type="number"
+                        // inputmode="numeric"
                         name="rows"
                         id="rows-input"
                         value={numRows}
@@ -79,24 +98,31 @@ const Controls = ({
             </div>
 
             <div className="control history">
-                <span>{historicTurnIndex > -1 ? historicTurnIndex : numTurns - 1}</span>
+                <span>
+                    {historicTurnIndex > -1 ? historicTurnIndex : numTurns - 1}
+                </span>
                 <input
-                className="slider"
+                    className="slider"
                     type="range"
                     min="0"
-                    max={numTurns-1}
-                    value={historicTurnIndex > -1 ? historicTurnIndex : numTurns-1}
+                    max={numTurns - 1}
+                    value={
+                        historicTurnIndex > -1
+                            ? historicTurnIndex
+                            : numTurns - 1
+                    }
                     // id="moves-slider"
-                    onChange={(event) => setHistoricTurnIndex(Number(event.target.value))}
-                    // list="markers"
+                    onChange={(event) =>
+                        setHistoricTurnIndex(Number(event.target.value))
+                    }
+                    list="markers"
                 />
-                {/* <datalist id="markers">{getMarkerDatalistOptions()}</datalist> */}
+                <datalist id="markers">{getMarkerDatalistOptions()}</datalist>
             </div>
             <br />
             <div className="control">
                 <button onPointerDown={forceUpdate}>RESTART</button>
             </div>
-
         </div>
     );
 };

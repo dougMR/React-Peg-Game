@@ -3,6 +3,7 @@ import React from "react";
 // import Slot from "./Slot.js";
 
 function addDown(n) {
+    // Used for building rows[]
     // Like factorial but with addition
     if (n === 0) {
         // stop subtracting when we reach zero
@@ -34,9 +35,7 @@ const Board = ({
     );
     // boardHistory is a record of slots from each turn
     const [boardHistory, setBoardHistory] = useState([]);
-    //
-    const buildRowsFlag = useRef(true);
-
+    
     // v Initialize board
     const buildSlots = () => {
         console.log("buildSlots()");
@@ -59,6 +58,7 @@ const Board = ({
         setSlots(initSlots);
 
         if (firstLoad) {
+            // only save this board configuration when component first mounts
             firstLoad = false;
             saveCurrentMove(initSlots);
         }
@@ -68,7 +68,7 @@ const Board = ({
         console.log("addColumnsAndRowsToSlots()");
         // This makes changes directly to the slots provided in the argument
 
-        // DMR 12/17/24 - ^ There were too many hoops previously.  This is more direct, and synchronous, fewer pitfalls.  In fact, this whole function could be folded into the buildSlots() function.
+        // DMR 12/17/24 - ^ There were too many hoops previously.  This is more direct, and synchronous, fewer pitfalls (avoids useEffect).  In fact, this whole function could be folded into the buildSlots() function.
 
         // rows is an array of arrays, each representing a row containing indices of slots in that row
         const rows = [];
@@ -93,9 +93,11 @@ const Board = ({
 
     const setSlotCssUnits = () => {
         // v This 'formula' is based on original css element sizes -> maybe 1 board-unit was 5 vmin?
+        // it sets unit size based on number of rows
         // anyhow, this works now. v
         const relativeUnit = 5 / numRows;
         setSlotUnit(`calc(${relativeUnit} * var(--board-unit))`);
+        // DMR ? 12/18/24 - in vanilla JS, I would directly change the css variable.  Is that kosher (or possible) in React?
     };
 
     useEffect(() => {
@@ -110,9 +112,6 @@ const Board = ({
             historicTurnIndex,
             "."
         );
-        // console.log('historicTurnIndex:',historicTurnIndex);
-        // console.log('boardHistory:',boardHistory.length)
-        // console.log('numTurns:',numTurns);
         if (historicTurnIndex >= 0) {
             showTurn(historicTurnIndex);
         }
@@ -128,18 +127,18 @@ const Board = ({
         const currentMove = copyObj(currentSlots);
         const newBoardHistory = copyObj(boardHistory); //[...boardHistory];
         // trim boardHistory if historicTurnIndex is less than latest turn
-        if (historicTurnIndex > 0)
+        if (historicTurnIndex > 0 && historicTurnIndex < newBoardHistory.length -1)
             newBoardHistory.length = historicTurnIndex + 1;
-        console.log("historicTurnIndex:", historicTurnIndex);
-        console.log("newBoardHistory.length:", newBoardHistory.length);
-        console.log(
-            "currentMove === newBoardHistory[newBoardHistory.length-1]:",
-            currentMove === newBoardHistory[newBoardHistory.length - 1]
-        );
-        console.log(
-            "currentMove === currentSlots:",
-            currentMove === currentSlots
-        );
+        // console.log("historicTurnIndex:", historicTurnIndex);
+        // console.log("newBoardHistory.length:", newBoardHistory.length);
+        // console.log(
+        //     "currentMove === newBoardHistory[newBoardHistory.length-1]:",
+        //     currentMove === newBoardHistory[newBoardHistory.length - 1]
+        // );
+        // console.log(
+        //     "currentMove === currentSlots:",
+        //     currentMove === currentSlots
+        // );
         setNumTurns(newBoardHistory.length + 1);
         setBoardHistory([...newBoardHistory, currentMove]);
         setHistoricTurnIndex(newBoardHistory.length);
