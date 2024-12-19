@@ -17,7 +17,7 @@ const copyObj = (obj) => {
     return JSON.parse(JSON.stringify(obj));
 };
 
-let firstLoad = true;
+// let firstLoad = true;
 
 const Board = ({
     numRows,
@@ -35,9 +35,9 @@ const Board = ({
     );
     // boardHistory is a record of slots from each turn
     const [boardHistory, setBoardHistory] = useState([]);
-    
+
     // v Initialize board
-    const buildSlots = () => {
+    const buildSlots = (overwriteMove = true) => {
         console.log("buildSlots()");
         const initSlots = [];
         const numSlots = addDown(numRows);
@@ -57,11 +57,13 @@ const Board = ({
         addColumnsAndRowsToSlots(initSlots);
         setSlots(initSlots);
 
-        if (firstLoad) {
-            // only save this board configuration when component first mounts
-            firstLoad = false;
-            saveCurrentMove(initSlots);
-        }
+        // if (firstLoad) {
+        //     console.log("FIRST LOAD")
+        //     // only save this board configuration when component first mounts
+        //     firstLoad = false;
+
+        // }
+        saveCurrentMove(initSlots, overwriteMove === true);
     };
 
     const addColumnsAndRowsToSlots = (slots) => {
@@ -101,9 +103,17 @@ const Board = ({
     };
 
     useEffect(() => {
-        console.log("useEffect buildSlots");
+        console.log(
+            "useEffect buildSlots triggered by component initial mount."
+        );
         setSlotCssUnits();
         buildSlots();
+    }, []);
+
+    useEffect(() => {
+        console.log("useEffect buildSlots triggered by numRows change.");
+        setSlotCssUnits();
+        buildSlots(true);
     }, [numRows]);
 
     useEffect(() => {
@@ -117,31 +127,28 @@ const Board = ({
         }
     }, [historicTurnIndex]);
 
-    // useEffect(() => {
-    //     console.log("boardHistory:", boardHistory);
-    // }, [boardHistory]);
-
     // Move History ----------------------------
-    const saveCurrentMove = (currentSlots) => {
+    const saveCurrentMove = (currentSlots, overwriteMove) => {
         console.log("  -- saveCurrentMove()");
         const currentMove = copyObj(currentSlots);
-        const newBoardHistory = copyObj(boardHistory); //[...boardHistory];
+        const newBoardHistory = copyObj(boardHistory);
+
         // trim boardHistory if historicTurnIndex is less than latest turn
-        if (historicTurnIndex > 0 && historicTurnIndex < newBoardHistory.length -1)
+        if (
+            historicTurnIndex > 0 &&
+            historicTurnIndex < newBoardHistory.length - 1
+        )
             newBoardHistory.length = historicTurnIndex + 1;
-        // console.log("historicTurnIndex:", historicTurnIndex);
-        // console.log("newBoardHistory.length:", newBoardHistory.length);
-        // console.log(
-        //     "currentMove === newBoardHistory[newBoardHistory.length-1]:",
-        //     currentMove === newBoardHistory[newBoardHistory.length - 1]
-        // );
-        // console.log(
-        //     "currentMove === currentSlots:",
-        //     currentMove === currentSlots
-        // );
-        setNumTurns(newBoardHistory.length + 1);
-        setBoardHistory([...newBoardHistory, currentMove]);
-        setHistoricTurnIndex(newBoardHistory.length);
+        // overwrite current turn if overwriteMove is true
+        if (overwriteMove===true && newBoardHistory.length > 0) {
+            newBoardHistory[newBoardHistory.length - 1] = currentMove;
+        } else {
+            newBoardHistory.push(currentMove);
+        }
+
+        setNumTurns(newBoardHistory.length);
+        setHistoricTurnIndex(newBoardHistory.length-1);
+        setBoardHistory(newBoardHistory);
     };
 
     const showTurn = (turnIndex) => {

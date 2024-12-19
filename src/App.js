@@ -15,7 +15,7 @@ import Controls from "./components/Controls.js";
 function App() {
     const [numRows, setNumRows] = useState(5);
     const [randomStartSlotChecked, setRandomStartSlotChecked] = useState(false);
-    const [showTargetSlots, setShowTargetSlots] = useState(false);
+    const [showTargetSlots, setShowTargetSlots] = useState(true);
     const [historicTurnIndex, setHistoricTurnIndex] = useState(-1);
     const [numTurns, setNumTurns] = useState(0);
 
@@ -26,8 +26,8 @@ function App() {
     };
 
     const forceUpdate = () => {
+        setNumTurns(0);
         setHistoricTurnIndex(-1);
-        setNumTurns(1);
         refreshBoardKey();
     };
 
@@ -39,7 +39,7 @@ function App() {
         <div className="App">
             <Board
                 numRows={numRows}
-                // ?? DMR 12/16/24 - Why does updating the key reset the board to start state?
+                // ?? DMR 12/16/24 - Why does updating the key reset the board to start state?  Is key a special prop?
                 key={refreshKey}
                 randomStartSlotChecked={randomStartSlotChecked}
                 showTargetSlots={showTargetSlots}
@@ -52,6 +52,7 @@ function App() {
                 setNumRows={setNumRows}
                 forceUpdate={forceUpdate}
                 setRandomStartSlotChecked={setRandomStartSlotChecked}
+                showTargetSlots={showTargetSlots}
                 setShowTargetSlots={setShowTargetSlots}
                 numTurns={numTurns}
                 setHistoricTurnIndex={setHistoricTurnIndex}
