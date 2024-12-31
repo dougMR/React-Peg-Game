@@ -37,6 +37,7 @@ function App() {
 
     return (
         <div className="App">
+            <div id="info-button">?</div>
             <Board
                 numRows={numRows}
                 // ?? DMR 12/16/24 - Why does updating the key reset the board to start state?  Is key a special prop?

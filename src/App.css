@@ -1,6 +1,5 @@
-
 body {
-  background-color: #999;
+    background-color: #999;
 }
 
 .App {
@@ -9,17 +8,47 @@ body {
     align-items: center;
     justify-content: space-around;
     height: 100vh;
-    --board-unit: 0.65vmin;
+    --board-unit: 0.6vmin;
     --slot-unit: calc(0.83 * var(--board-unit));
     padding-top: calc(22 * var(--board-unit));
     padding-bottom: calc(6 * var(--board-unit));
     box-sizing: border-box;
-    box-shadow: inset 0 0 calc(36 * var(--board-unit)) calc(6 * var(--board-unit)) black;
-    gap: calc(5 * var(--board-unit));
+    box-shadow: inset 0 0 calc(36 * var(--board-unit))
+        calc(6 * var(--board-unit)) black;
+    gap: calc(12 * var(--board-unit));
+}
+
+#info-button {
+    --white: #ffffff2f;
+    --black: #000000aa;
+    --size: 3rem;
+    position: fixed;
+    top: 1vmin;
+    right: 1vmin;
+    font-size: var(--size);
+    font-weight: bold;
+    /* background-color: yellow; */
+
+    color: var(--white);
+    border: 0.35rem solid var(--white);
+    border-radius: 50%;
+    /* text-shadow: 0 0 0.5rem var(--black), 0 0 0.25rem var(--black);
+  box-shadow: inset 0 0 0.5rem 0 var(--black), 0 0 0.5rem 0 var(--black); */
+    filter: drop-shadow(0 0 0.5rem var(--black));
+    width: var(--size);
+    height: var(--size);
+    text-align: center;
+    line-height: 1;
+    cursor: pointer;
+    &:hover {
+        /* color: var(--black); */
+        --white: #ffffffaa;
+        /* border-color: var(--black); */
+        filter: drop-shadow(0 0 0.25rem var(--white));
+    }
 }
 
 .board {
-
     position: relative;
     text-align: center;
     z-index: 10;
@@ -31,11 +60,11 @@ body {
         z-index: -1;
         width: 0;
         height: 0;
-        border-left: calc(64* var(--board-unit)) solid transparent;
-        border-right: calc(64* var(--board-unit)) solid transparent;
-        border-bottom: calc(104* var(--board-unit)) solid tan;
-        bottom: calc(-3* var(--board-unit));
-        left: calc(-11.5* var(--board-unit));
+        border-left: calc(64 * var(--board-unit)) solid transparent;
+        border-right: calc(64 * var(--board-unit)) solid transparent;
+        border-bottom: calc(104 * var(--board-unit)) solid tan;
+        bottom: calc(-3 * var(--board-unit));
+        left: calc(-11.5 * var(--board-unit));
     }
     &::after {
         content: "";
@@ -44,11 +73,11 @@ body {
         z-index: -10;
         width: 0;
         height: 0;
-        border-left: calc(72* var(--board-unit)) solid transparent;
-        border-right: calc(72* var(--board-unit)) solid transparent;
-        border-bottom: calc(116* var(--board-unit)) solid #cba673;
-        bottom: calc(-7.2* var(--board-unit));
-        left: calc(-19.5* var(--board-unit));
+        border-left: calc(72 * var(--board-unit)) solid transparent;
+        border-right: calc(72 * var(--board-unit)) solid transparent;
+        border-bottom: calc(116 * var(--board-unit)) solid #cba673;
+        bottom: calc(-7.2 * var(--board-unit));
+        left: calc(-19.5 * var(--board-unit));
     }
 }
 .slot {
@@ -70,7 +99,7 @@ body {
     box-sizing: border-box;
     &.target {
         /* border: 5px solid rgb(231, 75, 75); */
-        border: calc(5* var(--slot-unit)) solid rgb(203 112 85);
+        border: calc(5 * var(--slot-unit)) solid rgb(203 112 85);
         background-color: #2a77b9;
     }
     &.peg::after {
@@ -105,7 +134,7 @@ body {
                 calc(2.8 * var(--slot-unit)) black,
             /* 0 0 calc(4 * var(--slot-unit)) calc(4 * var(--slot-unit)) #009688, */
                 0 0 calc(7.4 * var(--slot-unit)) calc(5.5 * var(--slot-unit))
-                yellow;
+                #04aa6d;
         border-radius: 50%;
         width: 100%;
         height: 100%;
@@ -115,6 +144,14 @@ body {
 
 .controls {
     text-align: center;
+    padding: 1vmin 2vmin;
+    border-radius: 2vmin;
+    border: 0.5vmin solid transparent;
+    outline: 1px solid #ffffff88;
+    outline-offset: -0.55vmin;
+    box-shadow: 0 0 calc(3 * var(--board-unit)) 0 #ffffff88,
+        inset 0 0 calc(5 * var(--board-unit)) 0 #ffffff88;
+        z-index: 10;
     & .control {
         /* display: inline-block; */
         margin: 2vmin 1vmin;
@@ -123,20 +160,25 @@ body {
     }
     & button,
     input {
-      min-height: 1.5rem;
-      min-width: 1.5rem;
-      border-radius: 0.5rem;
-      border: 2px solid #3f3f3f;
-      background-color: #676767;
-      text-align: center;
-      vertical-align: middle;
-      padding: 0.3rem 0.5rem;
-      font-size: 1.3rem;
-      font-weight: bold;
-      color: #ddd;
-      &:hover {
-        box-shadow: inset -0.2rem 0.2rem 0.2rem #ffffff88, inset 0.2rem -0.2rem 0.2rem #00000088,  -0.1rem 0.1rem 0.4rem #000000aa ;
-      }
+        min-height: 1.5rem;
+        min-width: 1.5rem;
+        border-radius: 0.5rem;
+        border: 2px solid #3f3f3f;
+        background-color: #676767;
+        text-align: center;
+        vertical-align: middle;
+        padding: 0.3rem 0.5rem;
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #ddd;
+
+        accent-color: #04aa6d;
+
+        &:hover {
+            box-shadow: inset -0.2rem 0.2rem 0.2rem #ffffff88,
+                inset 0.2rem -0.2rem 0.2rem #00000088,
+                -0.1rem 0.1rem 0.4rem #000000aa;
+        }
         &[type="range"] {
             padding: 0;
         }
@@ -179,6 +221,27 @@ body {
             height: 2rem;
             background: #04aa6d;
             cursor: pointer;
+        }
+    }
+}
+
+@media (min-aspect-ratio: 6/7) {
+    .App {
+        gap: calc(5 * var(--board-unit));
+    }
+    .controls {
+        /* display:grid;
+    grid-template-columns: 1fr 1fr; */
+        width: 90vw;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        hr {
+            display: none;
+        }
+        .control {
+            flex: 1 0 32%;
+            margin: 1vmin 0.5vmin;
         }
     }
 }
