@@ -18,6 +18,7 @@ function App() {
     const [showTargetSlots, setShowTargetSlots] = useState(true);
     const [historicTurnIndex, setHistoricTurnIndex] = useState(-1);
     const [numTurns, setNumTurns] = useState(0);
+    const [instructionsVisible, setInstructionsVisible] = useState(false);
 
     const [refreshKey, setRefreshKey] = useState(0);
 
@@ -31,13 +32,55 @@ function App() {
         refreshBoardKey();
     };
 
+    const closeInfoModal = (event) => {
+        setInstructionsVisible(false);
+    };
+    const openInfoModal = () => {
+        setInstructionsVisible(true);
+    };
+
     // useEffect(() => {
     //     console.log("numTurns:", numTurns);
     // }, [numTurns]);
 
     return (
         <div className="App">
-            <div id="info-button">?</div>
+            <div id="info-button" onPointerDown={openInfoModal}>
+                ?
+            </div>
+            <div
+                id="info-modal"
+                className={instructionsVisible ? "show" : ""}
+                onPointerDown={closeInfoModal}
+            >
+                <div className="modal-content">
+                    <h2>Objective:</h2>
+                    <p>
+                        Jump pegs over each other to remove them from the board.
+                        Try to remove all but one peg.
+                    </p>
+                    <h2>How to play:</h2>
+                    <ul>
+                        <li>
+                            Click/tap a peg to select it. Then tap a destination
+                            slot to move it.
+                        </li>
+                        <li>
+                            Use the <span className="hilight">"Move"</span> slider to rewind to previous turns.
+                        </li>
+                        <li>
+                            Check the <span className="hilight">"Random Start Slot"</span> checkbox to toggle
+                            whether the empty start slot is placed randomly.
+                        </li>
+                        <li>
+                            Check the <span className="hilight">"Show Target Slots"</span> checkbox to highlight jump-to slots.
+                        </li>
+                        <li>
+                            Press the <span className="hilight">"Restart"</span> button to reset the board.
+                        </li>
+                    </ul>
+                </div>
+            </div>
             <Board
                 numRows={numRows}
                 // ?? DMR 12/16/24 - Why does updating the key reset the board to start state?  Is key a special prop?
