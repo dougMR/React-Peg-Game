@@ -69,6 +69,7 @@ body {
     text-align: center;
     line-height: 1;
     cursor: pointer;
+    z-index: 90;
     &:hover {
         /* color: var(--black); */
         --white: #ffffffaa;
@@ -104,7 +105,7 @@ body {
         & p,
         ul {
           color: #eee;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             & li {
                 margin: 1em 0;
             }
