@@ -44,7 +44,7 @@ function App() {
     // }, [numTurns]);
 
     return (
-        <div className="App">
+        <div className="App" >
             <div id="info-button" onPointerDown={openInfoModal}>
                 ?
             </div>
@@ -83,7 +83,7 @@ function App() {
             </div>
             <Board
                 numRows={numRows}
-                // ?? DMR 12/16/24 - Why does updating the key reset the board to start state?  Is key a special prop?
+                // ?? DMR 12/16/24 - updating the key resets all the the board values to start state?
                 key={refreshKey}
                 randomStartSlotChecked={randomStartSlotChecked}
                 showTargetSlots={showTargetSlots}

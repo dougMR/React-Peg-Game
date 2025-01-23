@@ -100,6 +100,7 @@ const Board = ({
         const relativeUnit = 5 / numRows;
         setSlotUnit(`calc(${relativeUnit} * var(--board-unit))`);
         // DMR ? 12/18/24 - in vanilla JS, I would directly change the css variable.  Is that kosher (or possible) in React?
+        // document.documentElement.style.setProperty('--slot-unit', slotUnit);
     };
 
     useEffect(() => {
@@ -152,11 +153,9 @@ const Board = ({
     };
 
     const showTurn = (turnIndex) => {
-        // const turnIndex = turnNum - 1;
         // load board layout
         console.log("showTurn(", turnIndex, ")");
         console.log("boardHistory.length:", boardHistory.length);
-        // console.log('this turn: ',boardHistory[turnIndex])
         setSlots(copyObj(boardHistory[turnIndex]));
     };
 
@@ -284,7 +283,7 @@ const Board = ({
     // };
 
     return (
-        <div className="board" style={{ "--slot-unit": slotUnit }}>
+        <div className="board" style={{ "--slot-unit": slotUnit}}>
             {slots.map((slot, index) => {
                 return (
                     <React.Fragment key={index}>

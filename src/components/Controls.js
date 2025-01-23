@@ -9,39 +9,29 @@ const Controls = ({
     historicTurnIndex,
     numTurns,
 }) => {
-    const rowsInputListener = (event) => {
-        const inputNum = Number(event.target.value);
-        const clampedNum = Math.min(10, Math.max(4, inputNum));
-        setNumRows(clampedNum);
-    };
+    // const rowsInputListener = (event) => {
+    //     const inputNum = Number(event.target.value);
+    //     const clampedNum = Math.min(10, Math.max(4, inputNum));
+    //     setNumRows(clampedNum);
+    // };
     const addRows = (numToAdd) => {
         const clampedNum = Math.min(10, Math.max(4, numRows + numToAdd));
         setNumRows(clampedNum);
     };
     const toggleRandomStartSlot = (event) => {
-        // console.log(event.target.checked)
         setRandomStartSlotChecked(event.target.checked);
     };
-    const restart = () => {
-        // DRM 8/12/24 - hacky solution for now...
-        console.log("RESTART");
-        setNumRows(numRows - 1);
-        setNumRows(numRows + 1);
-    };
+    // const restart = () => {
+    //     // - hacky solution for now...
+    //     console.log("RESTART");
+    //     setNumRows(numRows - 1);
+    //     setNumRows(numRows + 1);
+    // };
 
     const getMarkerDatalistOptions = () => {
-        // let optionsList = ``;
-        // for (let markerNum = 0; markerNum < numTurns - 1; markerNum++) {
-        //     console.log("optionsList:",optionsList);
-        //     optionsList += `<option value="${markerNum}">${markerNum}</option>`;
-        // }
-        // return optionsList;
-        console.log("numTurns:", numTurns);
         if (numTurns <= 0) return null;
         const options = new Array(numTurns - 1).fill(null);
-        console.log("options_ar:", options);
         return options.map((item, index) => {
-            console.log("option #", index);
             return (
                 <option key={index} value={index}>
                     {index}
@@ -77,6 +67,7 @@ const Controls = ({
                     list="markers"
                 />
                 <datalist id="markers">{getMarkerDatalistOptions()}</datalist>
+                {/* why doesn't this show markers on the range slider? */}
             </div>
 
             {/* <button onPointerDown={randomizeEmpty}>RANDOMIZE EMPTY</button> */}
@@ -107,25 +98,7 @@ const Controls = ({
                     />
                 </label>
             </div>
-            {/* <div className="control"> */}
             <div className="control" style={{display:numTurns <= 1 ? "block" : "none"}}>
-                {/* <label htmlFor="rows-input">
-                    {" "}
-                    NUM ROWS:
-                    <input
-                    style={{fieldSizing:"content"}}
-                        type="number"
-                        // inputmode="numeric"
-                        name="rows"
-                        id="rows-input"
-                        value={numRows}
-                        min="4"
-                        max="10"
-                        step="1"
-                        onChange={rowsInputListener}
-                    />
-                    &nbsp;
-                </label> */}
                 NUM ROWS: {numRows}{" "}
                 <button
                     onPointerDown={() => {
