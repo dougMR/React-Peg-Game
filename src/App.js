@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./App.css";
 import Board from "./components/Board.js";
 import Controls from "./components/Controls.js";
 
 //create your forceUpdate hook
 // function useForceUpdate() {
-
 //     const [value, setValue] = useState(0); // integer state
 //     return () => setValue((value) => {console.log("forceUpdate()"); return value + 1}); // update state to force render
 //     // A function that increment 👆🏻 the previous state like here
@@ -17,17 +16,18 @@ function App() {
     const [randomStartSlotChecked, setRandomStartSlotChecked] = useState(false);
     const [showTargetSlots, setShowTargetSlots] = useState(true);
     const [historicTurnIndex, setHistoricTurnIndex] = useState(-1);
-    const [numTurns, setNumTurns] = useState(0);
+    const [numTurnsTaken, setnumTurnsTaken] = useState(0);
     const [instructionsVisible, setInstructionsVisible] = useState(false);
 
     const [refreshKey, setRefreshKey] = useState(0);
 
     const refreshBoardKey = () => {
+        // changing the key fordes reload
         setRefreshKey((prevKey) => prevKey + 1);
     };
 
     const forceUpdate = () => {
-        setNumTurns(0);
+        setnumTurnsTaken(0);
         setHistoricTurnIndex(-1);
         refreshBoardKey();
     };
@@ -39,19 +39,16 @@ function App() {
         setInstructionsVisible(true);
     };
 
-    // useEffect(() => {
-    //     console.log("numTurns:", numTurns);
-    // }, [numTurns]);
-
     return (
-        <div className="App" >
-            <div id="info-button" onPointerDown={openInfoModal}>
+        <div className="App">
+            {/* DMR 1/23/25 - make this modal its own component? */}
+            <div id="info-button" onPointerUp={openInfoModal}>
                 ?
             </div>
             <div
                 id="info-modal"
                 className={instructionsVisible ? "show" : ""}
-                onPointerDown={closeInfoModal}
+                onPointerUp={closeInfoModal}
             >
                 <div className="modal-content">
                     <h2>Objective:</h2>
@@ -89,18 +86,18 @@ function App() {
                 showTargetSlots={showTargetSlots}
                 historicTurnIndex={historicTurnIndex}
                 setHistoricTurnIndex={setHistoricTurnIndex}
-                setNumTurns={setNumTurns}
+                setnumTurnsTaken={setnumTurnsTaken}
             ></Board>
             <Controls
                 numRows={numRows}
                 setNumRows={setNumRows}
-                forceUpdate={forceUpdate}
-                setRandomStartSlotChecked={setRandomStartSlotChecked}
                 showTargetSlots={showTargetSlots}
                 setShowTargetSlots={setShowTargetSlots}
-                numTurns={numTurns}
-                setHistoricTurnIndex={setHistoricTurnIndex}
                 historicTurnIndex={historicTurnIndex}
+                setHistoricTurnIndex={setHistoricTurnIndex}
+                forceUpdate={forceUpdate}
+                setRandomStartSlotChecked={setRandomStartSlotChecked}
+                numTurnsTaken={numTurnsTaken}
             />
         </div>
     );

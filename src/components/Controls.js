@@ -7,8 +7,13 @@ const Controls = ({
     setShowTargetSlots,
     setHistoricTurnIndex,
     historicTurnIndex,
-    numTurns,
+    numTurnsTaken,
 }) => {
+    // const rowsInputListener = (event) => {
+    //     const inputNum = Number(event.target.value);
+    //     const clampedNum = Math.min(10, Math.max(4, inputNum));
+    //     setNumRows(clampedNum);
+    // };
     // const rowsInputListener = (event) => {
     //     const inputNum = Number(event.target.value);
     //     const clampedNum = Math.min(10, Math.max(4, inputNum));
@@ -29,8 +34,8 @@ const Controls = ({
     // };
 
     const getMarkerDatalistOptions = () => {
-        if (numTurns <= 0) return null;
-        const options = new Array(numTurns - 1).fill(null);
+        if (numTurnsTaken <= 0) return null;
+        const options = new Array(numTurnsTaken - 1).fill(null);
         return options.map((item, index) => {
             return (
                 <option key={index} value={index}>
@@ -38,27 +43,31 @@ const Controls = ({
                 </option>
             );
         });
+        // let optionsText = "";
+        // for(let optionNum = 0; optionNum < numTurnsTaken; optionNum++){
+        //     optionsText+=`<option key=${optionNum} value=${optionNum}>
+        //             ${optionNum}
+        //         </option>`
+        // }
+        // return optionsText;
     };
 
     return (
         <div className="controls">
-            {/* <h3>
-                numTurns:{numTurns} <br /> historicTurnIndex:{historicTurnIndex}
-            </h3> */}
             <div className="control history">
                 <span>
                     MOVE{" "}
-                    {historicTurnIndex > -1 ? historicTurnIndex : numTurns - 1}
+                    {historicTurnIndex > -1 ? historicTurnIndex : numTurnsTaken - 1}
                 </span>
                 <input
                     className="slider"
                     type="range"
                     min="0"
-                    max={numTurns - 1}
+                    max={numTurnsTaken - 1}
                     value={
                         historicTurnIndex > -1
                             ? historicTurnIndex
-                            : numTurns - 1
+                            : numTurnsTaken - 1
                     }
                     // id="moves-slider"
                     onChange={(event) =>
@@ -98,7 +107,7 @@ const Controls = ({
                     />
                 </label>
             </div>
-            <div className="control" style={{display:numTurns <= 1 ? "block" : "none"}}>
+            <div className="control" style={{display:numTurnsTaken <= 1 ? "block" : "none"}}>
                 NUM ROWS: {numRows}{" "}
                 <button
                     onPointerDown={() => {

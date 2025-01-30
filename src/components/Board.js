@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from "react";
 import React from "react";
-// import Slot from "./Slot.js";
 
 function addDown(n) {
     // Used for building rows[]
@@ -17,7 +16,6 @@ const copyObj = (obj) => {
     return JSON.parse(JSON.stringify(obj));
 };
 
-// let firstLoad = true;
 
 const Board = ({
     numRows,
@@ -25,7 +23,7 @@ const Board = ({
     showTargetSlots,
     historicTurnIndex,
     setHistoricTurnIndex,
-    setNumTurns,
+    setnumTurnsTaken,
 }) => {
     // slots[] is the current board
     const [slots, setSlots] = useState([]);
@@ -56,13 +54,6 @@ const Board = ({
         console.log("initSlots.length:", initSlots.length);
         addColumnsAndRowsToSlots(initSlots);
         setSlots(initSlots);
-
-        // if (firstLoad) {
-        //     console.log("FIRST LOAD")
-        //     // only save this board configuration when component first mounts
-        //     firstLoad = false;
-
-        // }
         saveCurrentMove(initSlots, overwriteMove === true);
     };
 
@@ -147,7 +138,7 @@ const Board = ({
             newBoardHistory.push(currentMove);
         }
 
-        setNumTurns(newBoardHistory.length);
+        setnumTurnsTaken(newBoardHistory.length);
         setHistoricTurnIndex(newBoardHistory.length-1);
         setBoardHistory(newBoardHistory);
     };
@@ -161,12 +152,35 @@ const Board = ({
 
     // ^ / Move History
 
+
+    const checkGameOver = (slotsAr) => {
+        // look at each slot, see if a move can be made from there
+        let gameOver = true;
+        let pegsLeft = 0;
+        for ( const slot of slotsAr) {
+            if (slot.peg) {
+                pegsLeft++;
+                const fairTargets = getPegTargetSlots(slot);
+                if(fairTargets.length > 0){
+                    gameOver = false;
+                    break;
+                }
+            }
+        }
+        if(gameOver){
+            console.log("GAME OVER",pegsLeft,"left");
+            displayGameOver(pegsLeft);
+        }
+    }
+    const displayGameOver = (pegsLeft) => {
+
+    }
+
     // v Select a Slot
     const selectSlot = (index) => {
         console.log("  -- selectSlot(", index, ")");
         const slotsCopy = [...slots]; //copyObj(slots);
         const slot = slotsCopy[index];
-        // console.log("slot:", slot);
         if (slot.peg) {
             // Clear targets
             for (const slot of slotsCopy) {
@@ -174,7 +188,7 @@ const Board = ({
             }
             for (const s of slotsCopy) {
                 // deselect all slots
-                // toggle selected for clicked slot
+                // toggle .selected for clicked slot
                 s.selected = s === slot ? !slot.selected : false;
             }
             if (slot.selected) {
@@ -202,6 +216,7 @@ const Board = ({
             }
             saveCurrentMove(slotsCopy);
             setSlots(slotsCopy);
+            checkGameOver(slotsCopy);
         }
     };
     // ^ / Select a Slot
@@ -228,6 +243,7 @@ const Board = ({
 
     const getPegTargetSlots = (slot) => {
         // find slots 2 spaces away from slot in all directions
+        // must have a peg between this slot and target slot
         // console.log("getPegTargetSlots()");
         // console.log("from slot:", slot);
         const targetSlots = [];
