@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./App.css";
 import Board from "./components/Board.js";
 import Controls from "./components/Controls.js";
+import GameOver from "./components/GameOver.js";
 
 //create your forceUpdate hook
 // function useForceUpdate() {
@@ -18,6 +19,8 @@ function App() {
     const [historicTurnIndex, setHistoricTurnIndex] = useState(-1);
     const [numTurnsTaken, setnumTurnsTaken] = useState(0);
     const [instructionsVisible, setInstructionsVisible] = useState(false);
+    const [gameOver, setGameOver] = useState(false);
+    const [pegsRemaining, setPegsRemaining] = useState(-1);
 
     const [refreshKey, setRefreshKey] = useState(0);
 
@@ -27,6 +30,8 @@ function App() {
     };
 
     const forceUpdate = () => {
+        setGameOver(false);
+        setPegsRemaining(-1);
         setnumTurnsTaken(0);
         setHistoricTurnIndex(-1);
         refreshBoardKey();
@@ -63,17 +68,23 @@ function App() {
                             slot to move it.
                         </li>
                         <li>
-                            Use the <span className="hilight">"Move"</span> slider to rewind to previous turns.
+                            Use the <span className="hilight">"Move"</span>{" "}
+                            slider to rewind to previous turns.
                         </li>
                         <li>
-                            Check the <span className="hilight">"Random Start Slot"</span> checkbox to toggle
-                            whether the empty start slot is placed randomly.
+                            Check the{" "}
+                            <span className="hilight">"Random Start Slot"</span>{" "}
+                            checkbox to toggle whether the empty start slot is
+                            placed randomly.
                         </li>
                         <li>
-                            Check the <span className="hilight">"Show Target Slots"</span> checkbox to highlight jump-to slots.
+                            Check the{" "}
+                            <span className="hilight">"Show Target Slots"</span>{" "}
+                            checkbox to highlight jump-to slots.
                         </li>
                         <li>
-                            Press the <span className="hilight">"Restart"</span> button to reset the board.
+                            Press the <span className="hilight">"Restart"</span>{" "}
+                            button to reset the board.
                         </li>
                     </ul>
                 </div>
@@ -87,18 +98,29 @@ function App() {
                 historicTurnIndex={historicTurnIndex}
                 setHistoricTurnIndex={setHistoricTurnIndex}
                 setnumTurnsTaken={setnumTurnsTaken}
+                setGameOver={setGameOver}
+                setPegsRemaining={setPegsRemaining}
             ></Board>
-            <Controls
-                numRows={numRows}
-                setNumRows={setNumRows}
-                showTargetSlots={showTargetSlots}
-                setShowTargetSlots={setShowTargetSlots}
-                historicTurnIndex={historicTurnIndex}
-                setHistoricTurnIndex={setHistoricTurnIndex}
-                forceUpdate={forceUpdate}
-                setRandomStartSlotChecked={setRandomStartSlotChecked}
-                numTurnsTaken={numTurnsTaken}
-            />
+            {gameOver ? (
+                // show Game Over screen
+                <GameOver
+                    numTurnsTaken={numTurnsTaken}
+                    pegsRemaining={pegsRemaining}
+                    forceUpdate={forceUpdate}
+                />
+            ) : (
+                <Controls
+                    numRows={numRows}
+                    setNumRows={setNumRows}
+                    showTargetSlots={showTargetSlots}
+                    setShowTargetSlots={setShowTargetSlots}
+                    historicTurnIndex={historicTurnIndex}
+                    setHistoricTurnIndex={setHistoricTurnIndex}
+                    forceUpdate={forceUpdate}
+                    setRandomStartSlotChecked={setRandomStartSlotChecked}
+                    numTurnsTaken={numTurnsTaken}
+                />
+            )}
         </div>
     );
 }

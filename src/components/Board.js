@@ -24,6 +24,8 @@ const Board = ({
     historicTurnIndex,
     setHistoricTurnIndex,
     setnumTurnsTaken,
+    setGameOver,
+    setPegsRemaining,
 }) => {
     // slots[] is the current board
     const [slots, setSlots] = useState([]);
@@ -173,7 +175,8 @@ const Board = ({
         }
     }
     const displayGameOver = (pegsLeft) => {
-
+        setPegsRemaining(pegsLeft);
+        setGameOver(true);
     }
 
     // v Select a Slot
