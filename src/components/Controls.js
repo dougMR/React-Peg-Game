@@ -8,17 +8,10 @@ const Controls = ({
     setHistoricTurnIndex,
     historicTurnIndex,
     numTurnsTaken,
+    gameOver,
+    pegsRemaining,
 }) => {
-    // const rowsInputListener = (event) => {
-    //     const inputNum = Number(event.target.value);
-    //     const clampedNum = Math.min(10, Math.max(4, inputNum));
-    //     setNumRows(clampedNum);
-    // };
-    // const rowsInputListener = (event) => {
-    //     const inputNum = Number(event.target.value);
-    //     const clampedNum = Math.min(10, Math.max(4, inputNum));
-    //     setNumRows(clampedNum);
-    // };
+
     const addRows = (numToAdd) => {
         const clampedNum = Math.min(10, Math.max(4, numRows + numToAdd));
         setNumRows(clampedNum);
@@ -26,12 +19,6 @@ const Controls = ({
     const toggleRandomStartSlot = (event) => {
         setRandomStartSlotChecked(event.target.checked);
     };
-    // const restart = () => {
-    //     // - hacky solution for now...
-    //     console.log("RESTART");
-    //     setNumRows(numRows - 1);
-    //     setNumRows(numRows + 1);
-    // };
 
     const getMarkerDatalistOptions = () => {
         if (numTurnsTaken <= 0) return null;
@@ -43,13 +30,6 @@ const Controls = ({
                 </option>
             );
         });
-        // let optionsText = "";
-        // for(let optionNum = 0; optionNum < numTurnsTaken; optionNum++){
-        //     optionsText+=`<option key=${optionNum} value=${optionNum}>
-        //             ${optionNum}
-        //         </option>`
-        // }
-        // return optionsText;
     };
 
     return (
@@ -80,7 +60,16 @@ const Controls = ({
             </div>
 
             {/* <button onPointerDown={randomizeEmpty}>RANDOMIZE EMPTY</button> */}
+            {gameOver ? (
+                // show Game Over screen
+                <div className="control game-over">
+                <h2>GAME OVER</h2>
+                <p>Pegs Left: {pegsRemaining}</p>
+                <p>Turns taken: {numTurnsTaken}</p>
 
+            </div>
+            ) : (
+                <>
             <div className="control">
                 <label htmlFor="show-targets-checkbox">
                     SHOW MOVE OPTIONS
@@ -125,7 +114,8 @@ const Controls = ({
                     &#9660;
                 </button>
             </div>
-
+            </>
+            )}
             <div className="control">
                 <button onPointerDown={forceUpdate}>RESTART</button>
             </div>

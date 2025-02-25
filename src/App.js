@@ -101,14 +101,7 @@ function App() {
                 setGameOver={setGameOver}
                 setPegsRemaining={setPegsRemaining}
             ></Board>
-            {gameOver ? (
-                // show Game Over screen
-                <GameOver
-                    numTurnsTaken={numTurnsTaken}
-                    pegsRemaining={pegsRemaining}
-                    forceUpdate={forceUpdate}
-                />
-            ) : (
+     
                 <Controls
                     numRows={numRows}
                     setNumRows={setNumRows}
@@ -119,8 +112,10 @@ function App() {
                     forceUpdate={forceUpdate}
                     setRandomStartSlotChecked={setRandomStartSlotChecked}
                     numTurnsTaken={numTurnsTaken}
+                    pegsRemaining={pegsRemaining}
+                    gameOver={gameOver}
+
                 />
-            )}
         </div>
     );
 }
