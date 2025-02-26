@@ -242,14 +242,14 @@ const Board = ({
     };
 
     const getSlotBetween = (slotA, slotB) => {
-        console.log('getSlotBetween()');
-        console.log('slotA:',slotA);
-        console.log('slotB:',slotB);
+        // console.log('getSlotBetween()');
+        // console.log('slotA:',slotA);
+        // console.log('slotB:',slotB);
         const c = (slotA.myColumn + slotB.myColumn) / 2;
         const r = (slotA.myRow + slotB.myRow) / 2;
-        console.log('c,r:',c,r);
+        // console.log('c,r:',c,r);
         const slotBetween = getSlotByRowColumn(r, c);
-        console.log('slotBetween:',slotBetween);
+        // console.log('slotBetween:',slotBetween);
         return slotBetween;
     };
 
@@ -257,22 +257,22 @@ const Board = ({
         // find slots 2 spaces away from slot in all directions
         // must have a peg between this slot and target slot
         // console.log("getPegTargetSlots()");
-        console.log("from slot:", slot);
+        // console.log("from slot:", slot);
         const targetSlots = [];
         if (slot.peg) {
             const sr = slot.myRow,
                 sc = slot.myColumn;
-            console.log("sc,sr:",sc,sr);
+            // console.log("sc,sr:",sc,sr);
             for (let r = sr - 2; r < sr + 3; r += 2) {
                 for (let c = sc - 2; c < sc + 3; c += 2) {
                     // Rule out above to right, self and below to left
-                    console.log("c,r:",c,r);
+                    // console.log("c,r:",c,r);
                     if (
                         (r < sr && c > sc) ||
                         (r === sr && c === sc) ||
                         (r > sr && c < sc)
                     ) {
-                        console.log("no.")
+                        // console.log("no.")
                         continue;
                     }
                     const potentialTarget = getSlotByRowColumn(r, c);
@@ -283,15 +283,15 @@ const Board = ({
                             !potentialTarget.peg &&
                             getSlotBetween(slot, potentialTarget).peg
                         ) {
-                            console.log("target:",potentialTarget);
+                            // console.log("target:",potentialTarget);
                             targetSlots.push(potentialTarget);
                         }
                          else {
-                            console.log("no.")
+                            // console.log("no.")
                         }
                     }
                      else {
-                        console.log("no.")
+                        // console.log("no.")
                     }
                 }
             }
