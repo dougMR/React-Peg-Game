@@ -10,6 +10,7 @@ const Controls = ({
     numTurnsTaken,
     gameOver,
     pegsRemaining,
+    setShowMoveHint,
 }) => {
 
     const addRows = (numToAdd) => {
@@ -95,6 +96,19 @@ const Controls = ({
                         id="random-start-checkbox"
                     />
                 </label>
+            </div>
+            <hr />
+            <div className="control">
+                {/* <label htmlFor="show-moves-checkbox">
+                    SHOW MOVE HINTS
+                    <input
+                        type="checkbox"
+                        onChange={toggleShowMoves}
+                        name="show-moves"
+                        id="show-moves-checkbox"
+                    />
+                </label> */}
+                <button onPointerDown={(event)=>{console.log("SHOW HINTS CLICKED");setShowMoveHint(true)}}>SHOW HINT</button>
             </div>
             <div className="control" style={{display:numTurnsTaken <= 1 ? "block" : "none"}}>
                 NUM ROWS: {numRows}{" "}

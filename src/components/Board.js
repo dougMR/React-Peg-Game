@@ -1,3 +1,4 @@
+import { use } from "react";
 import { useEffect, useState, useRef } from "react";
 import React from "react";
 
@@ -25,6 +26,8 @@ const Board = ({
     setnumTurnsTaken,
     setGameOver,
     setPegsRemaining,
+    setShowMoveHint,
+    showMoveHint,
 }) => {
     // slots[] is the current board
     const [slots, setSlots] = useState([]);
@@ -37,7 +40,7 @@ const Board = ({
 
     // v Initialize board
     const buildSlots = (overwriteMove = true) => {
-        console.log("buildSlots()");
+        // console.log("buildSlots()");
         const initSlots = [];
         const numSlots = addDown(numRows);
         const emptyStartSlotIndex = randomStartSlotChecked
@@ -52,14 +55,14 @@ const Board = ({
                 target: false,
             };
         }
-        console.log("initSlots.length:", initSlots.length);
+        // console.log("initSlots.length:", initSlots.length);
         addColumnsAndRowsToSlots(initSlots);
         setSlots(initSlots);
         saveCurrentMove(initSlots, overwriteMove === true);
     };
 
     const addColumnsAndRowsToSlots = (slots) => {
-        console.log("addColumnsAndRowsToSlots()");
+        // console.log("addColumnsAndRowsToSlots()");
         // This makes changes directly to the slots provided in the argument
 
         // DMR 12/17/24 - ^ There were too many hoops previously.  This is more direct, and synchronous, fewer pitfalls (avoids useEffect).  In fact, this whole function could be folded into the buildSlots() function.
@@ -75,7 +78,7 @@ const Board = ({
                 slotIndex < firstIndex + rowLength;
                 slotIndex++
             ) {
-                // this is easier overall than the deleted getColum(slot) and getRow(slot).  Better to just add column / row to each slot when board is first created
+                // this is easier overall than the deleted getColum(slot) and getRow(slot).  Better here to just add column / row to each slot when board is first created
                 slots[slotIndex].myColumn = rows[r].length;
                 slots[slotIndex].myRow = r;
                 rows[r].push(slotIndex);
@@ -111,7 +114,7 @@ const Board = ({
 
     useEffect(() => {
         console.log(
-            "useEffect historicTurnIndex changed to",
+            "(board) useEffect historicTurnIndex changed to",
             historicTurnIndex,
             "."
         );
@@ -119,6 +122,17 @@ const Board = ({
             showTurn(historicTurnIndex);
         }
     }, [historicTurnIndex]);
+
+    useEffect(() => {
+        console.log("(board) useEffect slots changed to", slots, ".");
+    }, [slots]);
+
+    useEffect(() => {
+        console.log("(board) useEffect showMoveHint changed to", showMoveHint);
+        if (showMoveHint) {
+            showMoveHints();
+        }
+    }, [showMoveHint]);
 
     // Move History ----------------------------
     const saveCurrentMove = (currentSlots, overwriteMove) => {
@@ -149,12 +163,12 @@ const Board = ({
         console.log("showTurn(", turnIndex, ")");
         console.log("boardHistory.length:", boardHistory.length);
         const slotsCopy = copyObj(boardHistory[turnIndex]);
-        setSlots(slotsCopy);
         if (historicTurnIndex === boardHistory.length - 1) {
             checkGameOver(slotsCopy);
         } else {
             setGameOver(false);
         }
+        setSlots(slotsCopy);
     };
 
     // ^ / Move History
@@ -162,13 +176,14 @@ const Board = ({
     const checkGameOver = (slotsAr) => {
         console.log("checkGameOver()...");
         console.log("slotsAr:", slotsAr);
+        console.log("slots:", slots);
         // look at each slot, see if a move can be made from there
         let gameOver = true;
         let pegsLeft = 0;
         for (const slot of slotsAr) {
             if (slot.peg) {
                 pegsLeft++;
-                const fairTargets = getPegTargetSlots(slot);
+                const fairTargets = getPegTargetSlots(slot, slotsAr);
                 if (fairTargets.length > 0) {
                     gameOver = false;
                     console.log("NOT OVER");
@@ -180,13 +195,38 @@ const Board = ({
         }
         if (gameOver) {
             console.log("GAME OVER", pegsLeft, "left");
-            displayGameOver(pegsLeft);
+            // displayGameOver(pegsLeft);
+            setPegsRemaining(pegsLeft);
+            setGameOver(true);
+            return true;
+        } else {
+            return false;
         }
     };
-    const displayGameOver = (pegsLeft) => {
-        setPegsRemaining(pegsLeft);
-        setGameOver(true);
+
+    const showMoveHints = () => {
+        console.log("Board, showMoveHints()");
+        // look at each slot, see if a move can be made from there
+        const slotsCopy = copyObj(slots);
+        for (const slot of slotsCopy) {
+            if (slot.peg) {
+                const fairTargets = getPegTargetSlots(slot, slotsCopy);
+                if (fairTargets.length > 0) {
+                    slot.selected = true;
+                    for (const target of fairTargets) {
+                        target.target = true;
+                        console.log("target:", target);
+                    }
+                }
+            }
+        }
+        setSlots(slotsCopy);
     };
+
+    // const displayGameOver = (pegsLeft) => {
+    //     setPegsRemaining(pegsLeft);
+    //     setGameOver(true);
+    // };
 
     // v Select a Slot
     const selectSlot = (index) => {
@@ -198,13 +238,27 @@ const Board = ({
             for (const slot of slotsCopy) {
                 slot.target = false;
             }
+            // deselect all slots
             for (const s of slotsCopy) {
-                // deselect all slots
                 // toggle .selected for clicked slot
-                s.selected = s === slot ? !slot.selected : false;
+                if(s === slot){
+                    if(setShowMoveHint){
+                        s.selected = true;
+                    } else {
+                        s.selected = !s.selected;
+                    }
+                } else {
+                    s.selected = false;
+                }
+                // if(setShowMoveHint && s === slot){
+                //     s.selected = true;
+                // } else {
+                //     s.selected = s === slot ? !slot.selected : false;
+                // }
             }
+
             if (slot.selected) {
-                const fairTargets = getPegTargetSlots(slot);
+                const fairTargets = getPegTargetSlots(slot, slotsCopy);
                 for (const s of slotsCopy) {
                     // hilight target slots
                     s.target =
@@ -213,14 +267,15 @@ const Board = ({
                 }
             }
             setSlots(slotsCopy);
-        } else if (slot.target) {
+            setShowMoveHint(false);
+        } else if (slot.target && !showMoveHint) {
             // move peg from selected slot to here
             const selectedSlot = slotsCopy.find((s) => s.selected);
             console.log("selectedSlot:", selectedSlot.index);
             if (selectedSlot) {
                 selectedSlot.peg = false;
                 slot.peg = true;
-                getSlotBetween(selectedSlot, slot).peg = false;
+                getSlotBetween(selectedSlot, slot, slotsCopy).peg = false;
             }
             // Clear targets
             for (const slot of slotsCopy) {
@@ -234,26 +289,26 @@ const Board = ({
     // ^ / Select a Slot
 
     // v Utility stuff v
-    const getSlotByRowColumn = (r, c) => {
-        const slot = slots.find(
+    const getSlotByRowColumn = (r, c, slotsAr) => {
+        const slot = slotsAr.find(
             (slot) => slot.myColumn === c && slot.myRow === r
         );
         return slot;
     };
 
-    const getSlotBetween = (slotA, slotB) => {
-        // console.log('getSlotBetween()');
+    const getSlotBetween = (slotA, slotB, slotsAr) => {
+        // console.log("getSlotBetween(", slotA.index, slotB.index, ")");
         // console.log('slotA:',slotA);
         // console.log('slotB:',slotB);
         const c = (slotA.myColumn + slotB.myColumn) / 2;
         const r = (slotA.myRow + slotB.myRow) / 2;
         // console.log('c,r:',c,r);
-        const slotBetween = getSlotByRowColumn(r, c);
-        // console.log('slotBetween:',slotBetween);
+        const slotBetween = getSlotByRowColumn(r, c, slotsAr);
+        // console.log("slotBetween:", slotBetween);
         return slotBetween;
     };
 
-    const getPegTargetSlots = (slot) => {
+    const getPegTargetSlots = (slot, slotsAr) => {
         // find slots 2 spaces away from slot in all directions
         // must have a peg between this slot and target slot
         // console.log("getPegTargetSlots()");
@@ -262,36 +317,34 @@ const Board = ({
         if (slot.peg) {
             const sr = slot.myRow,
                 sc = slot.myColumn;
-            // console.log("sc,sr:",sc,sr);
+            // console.log("sc,sr:", sc, sr);
             for (let r = sr - 2; r < sr + 3; r += 2) {
                 for (let c = sc - 2; c < sc + 3; c += 2) {
+                    // console.log("c,r:", c, r);
                     // Rule out above to right, self and below to left
-                    // console.log("c,r:",c,r);
-                    if (
-                        (r < sr && c > sc) ||
-                        (r === sr && c === sc) ||
-                        (r > sr && c < sc)
-                    ) {
-                        // console.log("no.")
-                        continue;
-                    }
-                    const potentialTarget = getSlotByRowColumn(r, c);
+                    // if (
+                    //     (r < sr && c > sc) ||
+                    //     (r === sr && c === sc) ||
+                    //     (r > sr && c < sc)
+                    // ) {
+                    //     console.log("no. continue.")
+                    //     continue;
+                    // }
+                    const potentialTarget = getSlotByRowColumn(r, c, slotsAr);
                     if (potentialTarget) {
                         // is there a peg between target and moving peg?
 
                         if (
                             !potentialTarget.peg &&
-                            getSlotBetween(slot, potentialTarget).peg
+                            getSlotBetween(slot, potentialTarget, slotsAr).peg
                         ) {
-                            // console.log("target:",potentialTarget);
+                            // console.log("target:", potentialTarget);
                             targetSlots.push(potentialTarget);
+                        } else {
+                            // console.log("no. no peg between.");
                         }
-                         else {
-                            // console.log("no.")
-                        }
-                    }
-                     else {
-                        // console.log("no.")
+                    } else {
+                        // console.log("no. no potentialTarget.");
                     }
                 }
             }

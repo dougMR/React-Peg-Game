@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import Board from "./components/Board.js";
 import Controls from "./components/Controls.js";
@@ -21,8 +21,32 @@ function App() {
     const [instructionsVisible, setInstructionsVisible] = useState(false);
     const [gameOver, setGameOver] = useState(false);
     const [pegsRemaining, setPegsRemaining] = useState(-1);
-
     const [refreshKey, setRefreshKey] = useState(0);
+    const [showMoveHint, setShowMoveHint] = useState(false);
+
+    useEffect(() => {
+        console.log("======",'\n\r',"     App.js useEffect() - gameOver:", gameOver);
+    }, [gameOver]);
+
+    const saveGame = async (movesArray) => {
+        try {
+            const response = await fetch(`http://localhost:3001/save-game`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    player_name: "TESTER",
+                    moves_history: movesArray,
+                }),
+            });
+            const data = await response.json();
+
+            console.log("FETCHED DATA: ", data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     const refreshBoardKey = () => {
         // changing the key fordes reload
@@ -100,22 +124,24 @@ function App() {
                 setnumTurnsTaken={setnumTurnsTaken}
                 setGameOver={setGameOver}
                 setPegsRemaining={setPegsRemaining}
+                setShowMoveHint={setShowMoveHint}
+                showMoveHint={showMoveHint}
             ></Board>
-     
-                <Controls
-                    numRows={numRows}
-                    setNumRows={setNumRows}
-                    showTargetSlots={showTargetSlots}
-                    setShowTargetSlots={setShowTargetSlots}
-                    historicTurnIndex={historicTurnIndex}
-                    setHistoricTurnIndex={setHistoricTurnIndex}
-                    forceUpdate={forceUpdate}
-                    setRandomStartSlotChecked={setRandomStartSlotChecked}
-                    numTurnsTaken={numTurnsTaken}
-                    pegsRemaining={pegsRemaining}
-                    gameOver={gameOver}
 
-                />
+            <Controls
+                numRows={numRows}
+                setNumRows={setNumRows}
+                showTargetSlots={showTargetSlots}
+                setShowTargetSlots={setShowTargetSlots}
+                historicTurnIndex={historicTurnIndex}
+                setHistoricTurnIndex={setHistoricTurnIndex}
+                forceUpdate={forceUpdate}
+                setRandomStartSlotChecked={setRandomStartSlotChecked}
+                numTurnsTaken={numTurnsTaken}
+                pegsRemaining={pegsRemaining}
+                gameOver={gameOver}
+                setShowMoveHint={setShowMoveHint}
+            />
         </div>
     );
 }
