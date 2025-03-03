@@ -153,7 +153,7 @@ const Board = ({
             newBoardHistory.push(currentMove);
         }
 
-        setnumTurnsTaken(newBoardHistory.length);
+        setnumTurnsTaken(newBoardHistory.length - 1);
         setHistoricTurnIndex(newBoardHistory.length - 1);
         setBoardHistory(newBoardHistory);
     };
@@ -174,9 +174,9 @@ const Board = ({
     // ^ / Move History
 
     const checkGameOver = (slotsAr) => {
-        console.log("checkGameOver()...");
-        console.log("slotsAr:", slotsAr);
-        console.log("slots:", slots);
+        // console.log("checkGameOver()...");
+        // console.log("slotsAr:", slotsAr);
+        // console.log("slots:", slots);
         // look at each slot, see if a move can be made from there
         let gameOver = true;
         let pegsLeft = 0;
@@ -186,15 +186,15 @@ const Board = ({
                 const fairTargets = getPegTargetSlots(slot, slotsAr);
                 if (fairTargets.length > 0) {
                     gameOver = false;
-                    console.log("NOT OVER");
-                    console.log("peg slot:", slot);
-                    console.log("fairTargets", fairTargets);
+                    // console.log("NOT OVER");
+                    // console.log("peg slot:", slot);
+                    // console.log("fairTargets", fairTargets);
                     break;
                 }
             }
         }
         if (gameOver) {
-            console.log("GAME OVER", pegsLeft, "left");
+            // console.log("GAME OVER", pegsLeft, "left");
             // displayGameOver(pegsLeft);
             setPegsRemaining(pegsLeft);
             setGameOver(true);

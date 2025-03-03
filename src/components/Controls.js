@@ -44,15 +44,18 @@ const Controls = ({
                     className="slider"
                     type="range"
                     min="0"
-                    max={numTurnsTaken - 1}
+                    max={numTurnsTaken}
                     value={
                         historicTurnIndex > -1
                             ? historicTurnIndex
-                            : numTurnsTaken - 1
+                            : numTurnsTaken
                     }
                     // id="moves-slider"
                     onChange={(event) =>
-                        setHistoricTurnIndex(Number(event.target.value))
+                        {console.log('slider changed to:', event.target.value);
+                            console.log('numTurnsTaken:', numTurnsTaken);
+                            console.log('historicTurnIndex:', historicTurnIndex);
+                        setHistoricTurnIndex(Number(event.target.value))}
                     }
                     list="markers"
                 />
