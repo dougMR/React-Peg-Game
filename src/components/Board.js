@@ -160,10 +160,12 @@ const Board = ({
 
     const showTurn = (turnIndex) => {
         // load board layout
-        console.log("showTurn(", turnIndex, ")");
-        console.log("boardHistory.length:", boardHistory.length);
+        // console.log("showTurn(", turnIndex, ")");
+        // console.log("turnIndex:", turnIndex);
+        // console.log("historicTurnIndex:", historicTurnIndex);
+        // console.log("boardHistory.length:", boardHistory.length);
         const slotsCopy = copyObj(boardHistory[turnIndex]);
-        if (historicTurnIndex === boardHistory.length - 1) {
+        if (turnIndex === boardHistory.length - 1) {
             checkGameOver(slotsCopy);
         } else {
             setGameOver(false);
@@ -195,7 +197,6 @@ const Board = ({
         }
         if (gameOver) {
             // console.log("GAME OVER", pegsLeft, "left");
-            // displayGameOver(pegsLeft);
             setPegsRemaining(pegsLeft);
             setGameOver(true);
             return true;
@@ -205,9 +206,9 @@ const Board = ({
     };
 
     const showMoveHints = () => {
-        console.log("Board, showMoveHints()");
+        // console.log("Board, showMoveHints()");
         // look at each slot, see if a move can be made from there
-        const slotsCopy = copyObj(slots);
+        const slotsCopy = [...slots];
         for (const slot of slotsCopy) {
             if (slot.peg) {
                 const fairTargets = getPegTargetSlots(slot, slotsCopy);
@@ -215,18 +216,13 @@ const Board = ({
                     slot.selected = true;
                     for (const target of fairTargets) {
                         target.target = true;
-                        console.log("target:", target);
+                        // console.log("target:", target);
                     }
                 }
             }
         }
         setSlots(slotsCopy);
     };
-
-    // const displayGameOver = (pegsLeft) => {
-    //     setPegsRemaining(pegsLeft);
-    //     setGameOver(true);
-    // };
 
     // v Select a Slot
     const selectSlot = (index) => {
@@ -250,11 +246,6 @@ const Board = ({
                 } else {
                     s.selected = false;
                 }
-                // if(setShowMoveHint && s === slot){
-                //     s.selected = true;
-                // } else {
-                //     s.selected = s === slot ? !slot.selected : false;
-                // }
             }
 
             if (slot.selected) {
@@ -322,14 +313,14 @@ const Board = ({
                 for (let c = sc - 2; c < sc + 3; c += 2) {
                     // console.log("c,r:", c, r);
                     // Rule out above to right, self and below to left
-                    // if (
-                    //     (r < sr && c > sc) ||
-                    //     (r === sr && c === sc) ||
-                    //     (r > sr && c < sc)
-                    // ) {
-                    //     console.log("no. continue.")
-                    //     continue;
-                    // }
+                    if (
+                        (r < sr && c > sc) ||
+                        (r === sr && c === sc) ||
+                        (r > sr && c < sc)
+                    ) {
+                        // console.log("no. continue.")
+                        continue;
+                    }
                     const potentialTarget = getSlotByRowColumn(r, c, slotsAr);
                     if (potentialTarget) {
                         // is there a peg between target and moving peg?
@@ -352,16 +343,7 @@ const Board = ({
         // console.log('targetSlots:',targetSlots);
         return targetSlots;
     };
-
-    // const getFairTargetSlots = (fromSlot) => {
-    //     const fairTargets = getPegTargetSlots(fromSlot);
-    //     for (const slot of slots) {
-    //         // hilight target slots
-    //         slot.target =
-    //             fairTargets.find((target) => target === slot) !== undefined;
-    //     }
-    //     return fairTargets;
-    // };
+    // ^ / Utility stuff ^
 
     return (
         <div className="board" style={{ "--slot-unit": slotUnit }}>

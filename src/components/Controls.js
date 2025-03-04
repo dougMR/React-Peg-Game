@@ -113,7 +113,7 @@ const Controls = ({
                 </label> */}
                 <button onPointerDown={(event)=>{console.log("SHOW HINTS CLICKED");setShowMoveHint(true)}}>SHOW HINT</button>
             </div>
-            <div className="control" style={{display:numTurnsTaken <= 1 ? "block" : "none"}}>
+            <div className="control" style={{display:numTurnsTaken < 1 ? "block" : "none"}}>
                 NUM ROWS: {numRows}{" "}
                 <button
                     onPointerDown={() => {
