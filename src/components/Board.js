@@ -15,6 +15,7 @@ function addDown(n) {
 }
 const copyObj = (obj) => {
     return JSON.parse(JSON.stringify(obj));
+    // return structuredClone(obj);
 };
 
 const Board = ({
@@ -22,6 +23,7 @@ const Board = ({
     randomStartSlotChecked,
     showTargetSlots,
     historicTurnIndex,
+    // ^ index of currently displayed turn in boardHistory
     setHistoricTurnIndex,
     setnumTurnsTaken,
     setGameOver,
@@ -40,7 +42,7 @@ const Board = ({
 
     // v Initialize board
     const buildSlots = (overwriteMove = true) => {
-        // console.log("buildSlots()");
+        console.log("buildSlots()");
         const initSlots = [];
         const numSlots = addDown(numRows);
         const emptyStartSlotIndex = randomStartSlotChecked
@@ -57,8 +59,8 @@ const Board = ({
         }
         // console.log("initSlots.length:", initSlots.length);
         addColumnsAndRowsToSlots(initSlots);
-        setSlots(initSlots);
-        saveCurrentMove(initSlots, overwriteMove === true);
+        setSlots(copyObj(initSlots));
+        saveCurrentMove((initSlots), overwriteMove === true);
     };
 
     const addColumnsAndRowsToSlots = (slots) => {
@@ -100,46 +102,71 @@ const Board = ({
 
     useEffect(() => {
         console.log(
-            "useEffect buildSlots triggered by component initial mount."
+            "  ((((board) useEffect buildSlots triggered by component initial mount."
         );
         setSlotCssUnits();
         buildSlots();
     }, []);
 
     useEffect(() => {
-        console.log("useEffect buildSlots triggered by numRows change.");
+        console.log(
+            "  ((((board) useEffect buildSlots triggered by numRows change."
+        );
         setSlotCssUnits();
         buildSlots(true);
     }, [numRows]);
 
     useEffect(() => {
         console.log(
-            "(board) useEffect historicTurnIndex changed to",
+            "  ((((board) useEffect historicTurnIndex changed to",
             historicTurnIndex,
             "."
         );
         if (historicTurnIndex >= 0) {
-            showTurn(historicTurnIndex);
+            // boardHistory[historicTurnIndex]) {
+            // console.log("historicTurnIndex:", historicTurnIndex);
+            setSlots(boardHistory[historicTurnIndex]);
         }
     }, [historicTurnIndex]);
 
     useEffect(() => {
-        console.log("(board) useEffect slots changed to", slots, ".");
+        console.log("  ((((board) useEffect slots changed to", slots);
+        // console.log("--boardHistory:", boardHistory);
+        // for (const [index, element] of slots.entries()) {
+        //     console.log("slots[",index,"]===boardHistory[0][",index,"]:", element===boardHistory[0][index]);
+        // }
+
+        if (slots.length === addDown(numRows)) {
+            if (historicTurnIndex === boardHistory.length - 1) {
+                checkGameOver();
+            } else {
+                setGameOver(false);
+            }
+        }
     }, [slots]);
 
     useEffect(() => {
-        console.log("(board) useEffect showMoveHint changed to", showMoveHint);
+        console.log("  ((((board) useEffect showMoveHint changed to", showMoveHint);
         if (showMoveHint) {
             showMoveHints();
         }
     }, [showMoveHint]);
 
+    useEffect(() => {
+        console.log("  ((((board) useEffect boardHistory changed to", boardHistory);
+    }, [boardHistory]);
+
     // Move History ----------------------------
     const saveCurrentMove = (currentSlots, overwriteMove) => {
-        console.log("  -- saveCurrentMove()");
+        // Update boardHistory with currentSlots
+        console.log("  -- saveCurrentMove(overwriteMove:", overwriteMove === true, ")");
+        console.log("currentSlots:", currentSlots);
         const currentMove = copyObj(currentSlots);
+        console.log("currentSlots===currentMove:", currentSlots === currentMove);
+        // console.log("boardHistory:", boardHistory);
+        // console.log("boardHistory[0] === slots:", boardHistory[0] === slots);
         const newBoardHistory = copyObj(boardHistory);
-
+        // console.log("newBoardHistory:", newBoardHistory);
         // trim boardHistory if historicTurnIndex is less than latest turn
         if (
             historicTurnIndex > 0 &&
@@ -148,16 +175,21 @@ const Board = ({
             newBoardHistory.length = historicTurnIndex + 1;
         // overwrite current turn if overwriteMove is true
         if (overwriteMove === true && newBoardHistory.length > 0) {
+            console.log("overwrite current move");
             newBoardHistory[newBoardHistory.length - 1] = currentMove;
         } else {
+            console.log("add new move to history");
             newBoardHistory.push(currentMove);
         }
+        console.log("newNewBoardHistory:", newBoardHistory);
 
         setnumTurnsTaken(newBoardHistory.length - 1);
         setHistoricTurnIndex(newBoardHistory.length - 1);
+        console.log("SETTING BOARD HISTORY");
         setBoardHistory(newBoardHistory);
     };
 
+    /*
     const showTurn = (turnIndex) => {
         // load board layout
         // console.log("showTurn(", turnIndex, ")");
@@ -172,13 +204,15 @@ const Board = ({
         }
         setSlots(slotsCopy);
     };
+    */
 
     // ^ / Move History
 
     const checkGameOver = (slotsAr) => {
-        // console.log("checkGameOver()...");
+        console.log("checkGameOver()...");
         // console.log("slotsAr:", slotsAr);
         // console.log("slots:", slots);
+        slotsAr = slotsAr || slots;
         // look at each slot, see if a move can be made from there
         let gameOver = true;
         let pegsLeft = 0;
@@ -188,7 +222,7 @@ const Board = ({
                 const fairTargets = getPegTargetSlots(slot, slotsAr);
                 if (fairTargets.length > 0) {
                     gameOver = false;
-                    // console.log("NOT OVER");
+                    console.log("NOT OVER");
                     // console.log("peg slot:", slot);
                     // console.log("fairTargets", fairTargets);
                     break;
@@ -196,7 +230,7 @@ const Board = ({
             }
         }
         if (gameOver) {
-            // console.log("GAME OVER", pegsLeft, "left");
+            console.log("GAME OVER", pegsLeft, "left");
             setPegsRemaining(pegsLeft);
             setGameOver(true);
             return true;
@@ -206,7 +240,7 @@ const Board = ({
     };
 
     const showMoveHints = () => {
-        // console.log("Board, showMoveHints()");
+        console.log("Board, showMoveHints()");
         // look at each slot, see if a move can be made from there
         const slotsCopy = [...slots];
         for (const slot of slotsCopy) {
@@ -227,8 +261,9 @@ const Board = ({
     // v Select a Slot
     const selectSlot = (index) => {
         console.log("  -- selectSlot(", index, ")");
-        const slotsCopy = [...slots]; //copyObj(slots);
+        const slotsCopy = copyObj(slots);
         const slot = slotsCopy[index];
+
         if (slot.peg) {
             // Clear targets
             for (const slot of slotsCopy) {
@@ -237,8 +272,8 @@ const Board = ({
             // deselect all slots
             for (const s of slotsCopy) {
                 // toggle .selected for clicked slot
-                if(s === slot){
-                    if(setShowMoveHint){
+                if (s === slot) {
+                    if (setShowMoveHint) {
                         s.selected = true;
                     } else {
                         s.selected = !s.selected;
@@ -274,7 +309,7 @@ const Board = ({
             }
             saveCurrentMove(slotsCopy);
             setSlots(slotsCopy);
-            checkGameOver(slotsCopy);
+            // checkGameOver(slotsCopy);
         }
     };
     // ^ / Select a Slot
@@ -344,9 +379,9 @@ const Board = ({
         return targetSlots;
     };
     // ^ / Utility stuff ^
-
     return (
         <div className="board" style={{ "--slot-unit": slotUnit }}>
+            {/* {console.log("SLOTS:", slots)} */}
             {slots.map((slot, index) => {
                 return (
                     <React.Fragment key={index}>

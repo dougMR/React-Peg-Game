@@ -17,6 +17,7 @@ function App() {
     const [randomStartSlotChecked, setRandomStartSlotChecked] = useState(false);
     const [showTargetSlots, setShowTargetSlots] = useState(true);
     const [historicTurnIndex, setHistoricTurnIndex] = useState(-1);
+    // ^ index of currently displayed turn in boardHistory
     const [numTurnsTaken, setnumTurnsTaken] = useState(0);
     const [instructionsVisible, setInstructionsVisible] = useState(false);
     const [gameOver, setGameOver] = useState(false);
@@ -25,7 +26,12 @@ function App() {
     const [showMoveHint, setShowMoveHint] = useState(false);
 
     useEffect(() => {
-        console.log("======",'\n\r',"     App.js useEffect() - gameOver:", gameOver);
+        console.log(
+            "======",
+            "\n\r",
+            "     App.js useEffect() - gameOver:",
+            gameOver
+        );
     }, [gameOver]);
 
     const saveGame = async (movesArray) => {

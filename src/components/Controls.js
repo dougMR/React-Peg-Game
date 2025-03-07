@@ -7,12 +7,12 @@ const Controls = ({
     setShowTargetSlots,
     setHistoricTurnIndex,
     historicTurnIndex,
+    // ^ index of currently displayed turn in boardHistory
     numTurnsTaken,
     gameOver,
     pegsRemaining,
     setShowMoveHint,
 }) => {
-
     const addRows = (numToAdd) => {
         const clampedNum = Math.min(10, Math.max(4, numRows + numToAdd));
         setNumRows(clampedNum);
@@ -38,7 +38,9 @@ const Controls = ({
             <div className="control history">
                 <span>
                     MOVE{" "}
-                    {historicTurnIndex > -1 ? historicTurnIndex : numTurnsTaken - 1}
+                    {historicTurnIndex > -1
+                        ? historicTurnIndex
+                        : numTurnsTaken - 1}
                 </span>
                 <input
                     className="slider"
@@ -51,12 +53,12 @@ const Controls = ({
                             : numTurnsTaken
                     }
                     // id="moves-slider"
-                    onChange={(event) =>
-                        {console.log('slider changed to:', event.target.value);
-                            console.log('numTurnsTaken:', numTurnsTaken);
-                            console.log('historicTurnIndex:', historicTurnIndex);
-                        setHistoricTurnIndex(Number(event.target.value))}
-                    }
+                    onChange={(event) => {
+                        console.log("slider changed to:", event.target.value);
+                        console.log("numTurnsTaken:", numTurnsTaken);
+                        console.log("historicTurnIndex:", historicTurnIndex);
+                        setHistoricTurnIndex(Number(event.target.value));
+                    }}
                     list="markers"
                 />
                 <datalist id="markers">{getMarkerDatalistOptions()}</datalist>
@@ -67,42 +69,41 @@ const Controls = ({
             {gameOver ? (
                 // show Game Over screen
                 <div className="control game-over">
-                <h2>GAME OVER</h2>
-                <p>Pegs Left: {pegsRemaining}</p>
-                <p>Turns taken: {numTurnsTaken}</p>
-
-            </div>
+                    <h2>GAME OVER</h2>
+                    <p>Pegs Left: {pegsRemaining}</p>
+                    <p>Turns taken: {numTurnsTaken}</p>
+                </div>
             ) : (
                 <>
-            <div className="control">
-                <label htmlFor="show-targets-checkbox">
-                    SHOW MOVE OPTIONS
-                    <input
-                        type="checkbox"
-                        checked={showTargetSlots}
-                        onChange={(event) => {
-                            setShowTargetSlots(event.target.checked);
-                        }}
-                        name="show-targets"
-                        id="show-targets-checkbox"
-                    />
-                </label>
-            </div>
-            <hr />
-            <div className="control">
-                <label htmlFor="random-start-checkbox">
-                    RANDOM EMPTY START HOLE
-                    <input
-                        type="checkbox"
-                        onChange={toggleRandomStartSlot}
-                        name="random-start"
-                        id="random-start-checkbox"
-                    />
-                </label>
-            </div>
-            <hr />
-            <div className="control">
-                {/* <label htmlFor="show-moves-checkbox">
+                    <div className="control">
+                        <label htmlFor="show-targets-checkbox">
+                            SHOW MOVE OPTIONS
+                            <input
+                                type="checkbox"
+                                checked={showTargetSlots}
+                                onChange={(event) => {
+                                    setShowTargetSlots(event.target.checked);
+                                }}
+                                name="show-targets"
+                                id="show-targets-checkbox"
+                            />
+                        </label>
+                    </div>
+                    <hr />
+                    <div className="control">
+                        <label htmlFor="random-start-checkbox">
+                            RANDOM EMPTY START HOLE
+                            <input
+                                type="checkbox"
+                                onChange={toggleRandomStartSlot}
+                                name="random-start"
+                                id="random-start-checkbox"
+                            />
+                        </label>
+                    </div>
+                    <hr />
+                    <div className="control">
+                        {/* <label htmlFor="show-moves-checkbox">
                     SHOW MOVE HINTS
                     <input
                         type="checkbox"
@@ -111,27 +112,39 @@ const Controls = ({
                         id="show-moves-checkbox"
                     />
                 </label> */}
-                <button onPointerDown={(event)=>{console.log("SHOW HINTS CLICKED");setShowMoveHint(true)}}>SHOW HINT</button>
-            </div>
-            <div className="control" style={{display:numTurnsTaken < 1 ? "block" : "none"}}>
-                NUM ROWS: {numRows}{" "}
-                <button
-                    onPointerDown={() => {
-                        addRows(1);
-                    }}
-                >
-                    &#9650;
-                </button>
-                <button
-                    onPointerDown={() => {
-                        addRows(-1);
-                    }}
-                    style={{ marginLeft: "0.3rem" }}
-                >
-                    &#9660;
-                </button>
-            </div>
-            </>
+                        <button
+                            onPointerDown={(event) => {
+                                console.log("SHOW HINTS CLICKED");
+                                setShowMoveHint(true);
+                            }}
+                        >
+                            SHOW HINT
+                        </button>
+                    </div>
+                    <div
+                        className="control"
+                        style={{
+                            display: numTurnsTaken < 1 ? "block" : "none",
+                        }}
+                    >
+                        NUM ROWS: {numRows}{" "}
+                        <button
+                            onPointerDown={() => {
+                                addRows(1);
+                            }}
+                        >
+                            &#9650;
+                        </button>
+                        <button
+                            onPointerDown={() => {
+                                addRows(-1);
+                            }}
+                            style={{ marginLeft: "0.3rem" }}
+                        >
+                            &#9660;
+                        </button>
+                    </div>
+                </>
             )}
             <div className="control">
                 <button onPointerDown={forceUpdate}>RESTART</button>
